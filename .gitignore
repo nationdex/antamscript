@@ -1,0 +1,16 @@
+# dependencies
+node_modules
+
+# lockfile backups
+bun.lockb
+
+# environment variables
+.env
+.env.*
+
+# logs
+*.log
+
+# build output
+dist
+coverage
