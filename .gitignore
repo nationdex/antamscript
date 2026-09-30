@@ -12,5 +12,4 @@ bun.lockb
 *.log
 
 # build output
-dist
 coverage

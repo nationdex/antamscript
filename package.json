@@ -1,21 +1,62 @@
 {
-  "name": "antamscript",
-  "type": "module",
+  "name": "@nationdex/antamscript",
+  "version": "1.0.0",
+  "description": "ForgeScript but B I G, 69x more steroided and powerful, maaaaaan das ist crazy!",
+  "license": "Apache-2.0",
   "private": true,
+  "type": "module",
+  "homepage": "https://github.com/nationdex/antamscript#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nationdex/antamscript.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nationdex/antamscript/issues"
+  },
+  "readme": "README.md",
+  "keywords": [
+    "antamscript",
+    "discord",
+    "bots",
+    "forgescript",
+    "nds",
+    "nationdex",
+    "nationdex-solutions"
+  ],
+  "authors": [
+    {
+      "name": "ariel-aram",
+      "email": "arielaram@nationdex.com"
+    },
+    {
+      "name": "adidotzip",
+      "email": "[EMAIL_ADDRESS]"
+    },
+    {
+      "name": "user-lezi",
+      "email": "[EMAIL_ADDRESS]"
+    },
+    {
+      "name": "Kino7916",
+      "email": "[EMAIL_ADDRESS]"
+    }
+  ],
   "engines": {
     "bun": ">=1.4.2"
   },
   "scripts": {
-    "dev": "bun run --hot src/index.ts",
-    "start": "bun run src/index.ts",
+    "build": "bun build src/index.ts --outdir dist",
     "check": "biome check .",
-    "format": "biome format --write ."
+    "dev": "bun run --hot src/index.ts",
+    "format": "biome format --write .",
+    "start": "bun run src/index.ts",
+    "typecheck": "bun x @ts-blank-space/tsc"
   },
   "dependencies": {
     "discord.js": "^14.27.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.14",
+    "@biomejs/biome": "^2.5.15",
     "@types/bun": "^1.4.2",
     "typescript": "^7.0.2"
   }
