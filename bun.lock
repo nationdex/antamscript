@@ -1,9 +1,9 @@
 {
   "lockfileVersion": 2,
-  "configVersion": 0,
+  "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "antamscript",
+      "name": "@nationdex/antamscript",
       "dependencies": {
         "discord.js": "^14.27.0",
       },
