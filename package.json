@@ -42,7 +42,8 @@
     }
   ],
   "engines": {
-    "bun": ">=1.4.2"
+    "bun": ">=1.4.0",
+    "node": ">=22.0.0"
   },
   "scripts": {
     "build": "bun build src/index.ts --outdir dist",
