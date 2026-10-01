@@ -40,12 +40,12 @@ bun run typecheck
 
 ### 👷 Maintainers
 
-| Maintainers | Roles              |
-| ----------- | ------------------ |
-| ariel-aram  | Founder/Leader     |
-| adidotzip   | Frontend Developer |
-| user-lezi   | Backend Developer  |
-| Kino7916    | Backend Developer  |
+| Maintainers  | Roles              |
+| ------------ | ------------------ |
+| ariel-aram   | Founder/Leader     |
+| adidotzip    | Frontend Developer |
+| user-lezi    | Backend Developer  |
+| RelevantZone | Backend Developer  |
 
 ## ⚖️ License
 
