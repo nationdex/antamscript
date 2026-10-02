@@ -54,7 +54,9 @@
     "typecheck": "bun x @ts-blank-space/tsc"
   },
   "dependencies": {
-    "discord.js": "^14.27.0"
+    "discord.js": "^14.27.0",
+    "leac": "^0.7.0",
+    "peberminta": "^0.10.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",
