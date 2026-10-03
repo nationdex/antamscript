@@ -1,5 +1,5 @@
 import { describe, it } from 'node:test'
-import { tryParse } from '../source/internal/parser.ts'
+import { tryParse } from '../src/internal/parser.ts'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import { inspect } from 'util';

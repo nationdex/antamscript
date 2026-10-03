@@ -47,24 +47,40 @@ const call_: p.Parser<Token, unknown, ASTNode>
     = p.abc(
         literal('call'),
         p.sepBy(
-            p.recursive(() => program_),
+            p.recursive(() => p.many(program_)),
             literal(';')
         ),
         p.option(literal(']'), ''),
         (name, inside, end) => {
-            return { kind: 'call', ...ident(name), arguments: inside }
+            return { kind: 'call', ...ident(name), arguments: inside } as ASTNode
         }
     )
+const ue_tok_: p.Parser<Token, unknown, ASTNode>
+    = p.token(t => t.name === ';' ? undefined: ({ kind: 'text', value: t.text, text: t.text }))
 
-const program_ = p.choice(
-    escape_,
-    call_,
-    ident_,
-    p.map(
-        p.many(text_),
-        (texts) => texts.reduce(())
-    )
+const literal_ = p.map(
+    p.many1(
+        p.choice(
+            escape_,
+            text_
+        )
+    ),
+    (values) => values.reduce((perv, node) => {
+        if (! perv) return;
+        if (perv.kind === 'text' && node.kind === 'text') {
+            perv.text += node.text;
+            perv.value += node.value;
+        }
+        return perv
+    }, values.shift())
 )
+
+const program_ =
+    p.choice(
+        literal_,
+        call_,
+        ident_,
+    )
 
 export function tryParse(input: string) {
     const { tokens, complete } = lex(input)
