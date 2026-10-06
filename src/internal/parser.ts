@@ -66,7 +66,7 @@ const call_: p.Parser<Token, Options, ASTNode>
     )
 
 
-const ue_tok_: p.Parser<Token, Options, ASTNode>
+const stray_token_: p.Parser<Token, Options, ASTNode>
     = p.token((t, d) => {
         if (d.options.__state.count_block) return undefined
         if (!';]'.includes(t.name)) return undefined
@@ -78,7 +78,7 @@ const literal_ = p.map(
         p.choice(
             escape_,
             text_,
-            ue_tok_
+            stray_token_
         )
     ),
     (values) => values.reduce((perv, node) => {
