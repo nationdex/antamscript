@@ -89,10 +89,15 @@ export class Transpiler {
   public static GlobalImportFunctions = [
     [
       "eval",
-      async (code: string, data: TranspiledResultRunData, doNotRun = false) => {
+      async (
+        code: string,
+        data: TranspiledResultRunData,
+        minify: boolean,
+        doNotRun = false,
+      ) => {
         const result = await data.transpiler!.transpile(code, {
           ignoreText: false,
-          minify: true,
+          minify,
           terminator: "$ctx.content",
         });
         if (doNotRun) return result;

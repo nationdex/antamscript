@@ -30,7 +30,7 @@ export default new AntamFunction({
     return this.success(
       ctx,
       ArgType.Unknown,
-      `await f$eval(${code.code}, ${Code.reservedNames.data})`,
+      `await f$eval(${code.code}, ${Code.reservedNames.data}, false)`,
     );
   },
 });

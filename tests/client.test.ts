@@ -46,9 +46,7 @@ client.commands.add({
 client.commands.add({
   type: "messageCreate",
   name: "sum",
-  code: `$let[sum;$sum[3999;$ping ;3029]]
-  $log[sum -> $get[sum]]
-  $sendMessage[$channelID;sum -> $get[sum];false]
+  code: `$sum[30;20] $executionTimems
   `,
 });
 

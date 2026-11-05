@@ -20,7 +20,7 @@ export default new AntamFunction({
       description: "Whether to minify the transpiled code",
       required: true,
       type: ArgType.Boolean,
-      save: false,
+      save: true,
       rest: false,
     },
     {
@@ -39,7 +39,7 @@ export default new AntamFunction({
     return this.success(
       ctx,
       ArgType.Unknown,
-      `(await f$eval(${Code.joinArguments(code.code)}, ${Code.reservedNames.data}, true))[${minify.code} ? "minifiedCode" : "code"]`,
+      `(await f$eval(${Code.joinArguments(code.code)}, ${Code.reservedNames.data}, ${minify.variable}, true))[${minify.variable} ? "minifiedCode" : "code"]`,
     );
   },
 });
