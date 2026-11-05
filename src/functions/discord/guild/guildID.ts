@@ -18,16 +18,15 @@ export default new AntamFunction({
       save: false,
     },
   ],
-  importFunctions: getDiscordImportedFunctions("findGuild"),
+  importFunctions: [
+    ...getDiscordImportedFunctions("findGuild"),
+    "predicateGuildByNameOrObj",
+  ],
   transpile(ctx, [name]) {
-    const predicateCode = `{
-      let g = ${name.code} || ${Code.reservedNames.discord}.guild;
-        return !g ? null : typeof g == "string" ? g == guild.name : g.id == guild.id;
-      }`;
     return this.success(
       ctx,
       ArgType.Snowflake,
-      `(f$findGuild(${Code.reservedNames.client}, guild => ${predicateCode})?.id ?? null)`,
+      `(f$findGuild(${Code.reservedNames.client}, guild => f$predicateGuildByNameOrObj(${name.code} || ${Code.reservedNames.discord}.guild))?.id ?? null)`,
     );
   },
 });

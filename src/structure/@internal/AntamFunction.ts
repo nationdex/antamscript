@@ -1,7 +1,9 @@
-import { GlobalFunctions, Transpiler } from "../../core/Transpiler";
+import {
+  getGlobalImportedFunctions,
+  GlobalFunctionsNames,
+} from "../../functions/imported";
 import { Arrayable, EnumLike } from "../../utils/typings";
 import { ArgType, IArg, UnwrapArgs } from "./Arg";
-import { Code } from "./Code";
 import { Context } from "./Context";
 import { Return } from "./Return";
 import { TranspiledFunction } from "./TranspiledFunction";
@@ -40,7 +42,7 @@ export interface IAntamFunction<T extends [...IArg[]]> {
   args?: [...T];
   output: FunctionOutputType;
 
-  importFunctions?: ([string, Function] | GlobalFunctions)[];
+  importFunctions?: ([string, Function] | GlobalFunctionsNames)[];
 
   /**
    * If `undefined`, function has no brackets.
@@ -76,10 +78,11 @@ export class AntamFunction<T extends [...IArg[]] = IArg[]> {
         Array.isArray(x)
           ? [x[0], typeof x[1] === "string" ? x[1] : `(${x[1].toString()})`]
           : (() => {
-              const imported = Transpiler.getGlobalImportFunction(x);
-              if (!imported)
+              const imported = getGlobalImportedFunctions(x);
+              const found = imported[0];
+              if (!found)
                 throw new Error(`Global import function "${x}" not found`);
-              return [imported[0], `(${imported[1].toString()})`];
+              return [found[0], `(${found[1].toString()})`];
             })(),
       ) ?? []
     );

@@ -16,12 +16,28 @@ export default new AntamFunction({
       rest: false,
       save: true,
     },
+    {
+      name: "end index",
+      description: "The end index",
+      rest: false,
+      type: ArgType.Number,
+      required: false,
+      save: true,
+    },
   ],
-  transpile(ctx, [index]) {
+  transpile(ctx, [index, endIndex]) {
+    if (this.hasFields) {
+      return this.success(
+        ctx,
+        ArgType.String,
+        `(typeof ${endIndex.variable} == "number" ? ${Code.reservedNames.discord}.args.slice(${index.variable}, ${endIndex.variable}).join(" ") : ${Code.reservedNames.discord}.args[${index.variable}])`,
+      );
+    }
+
     return this.success(
       ctx,
       ArgType.String,
-      `(typeof ${index.variable} == "number" ? ${Code.reservedNames.discord}.args[${index.variable}] :  ${Code.reservedNames.discord}.args.join(" ")) ?? ""`,
+      `${Code.reservedNames.discord}.args.join(" ")`,
     );
   },
 });

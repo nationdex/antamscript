@@ -41,14 +41,12 @@ export default new AntamFunction({
       save: false,
     },
   ],
-  importFunctions: getDiscordImportedFunctions("findChannel", "sendMessage"),
+  importFunctions: [
+    ...getDiscordImportedFunctions("findChannel", "sendMessage"),
+    "predicateChannelByIDOrObj",
+  ],
   async transpile(ctx, [chnlID, content, returnMessage]) {
-    const predicateCode = `{
-    let chnl = ${chnlID.variable} ?? null;
-      return !chnl ? null : ((typeof chnl == "string" ? chnl: chnl.id) == channel.id);
-    }`;
-    let code = `await f$sendMessage(${Code.reservedNames.context}, f$findChannel(${Code.reservedNames.client}, channel => ${predicateCode}), ${content.code}, ${returnMessage.code})`;
-
+    const code = `await f$sendMessage(${Code.reservedNames.context}, f$findChannel(${Code.reservedNames.client}, channel => f$predicateChannelByIDOrObj(channel, ${chnlID.code}||null)), ${content.code}, ${returnMessage.code})`;
     return this.success(ctx, [ArgType.Message, "void"], code);
   },
 });

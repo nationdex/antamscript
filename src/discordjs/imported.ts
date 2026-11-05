@@ -16,6 +16,11 @@ export const ImportedDiscordFunctions = {
   findGuildByID: (client: AntamClient, id: string) => {
     return client.guilds.cache.get(id) || null;
   },
+  findMessageByID: (client: AntamClient, channel: Channel, id: string) => {
+    return channel && channel.isTextBased()
+      ? channel.messages.cache.get(id) || null
+      : null;
+  },
 
   findChannel: (
     client: AntamClient,

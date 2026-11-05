@@ -49,9 +49,6 @@ export interface TranspiledResultRunData {
   transpiler?: typeof Transpiler;
 }
 
-export type GlobalFunctions =
-  (typeof Transpiler)["GlobalImportFunctions"][number][0];
-
 export interface TranspiledResult {
   run: (data: TranspiledResultRunData) => Promise<unknown>;
   input: string;
@@ -85,44 +82,6 @@ export class Transpiler {
     [Code.reservedNames.discord]: "discord",
     [Code.reservedNames.transpiler]: "transpiler",
   };
-
-  public static GlobalImportFunctions = [
-    [
-      "eval",
-      async (
-        code: string,
-        data: TranspiledResultRunData,
-        minify: boolean,
-        doNotRun = false,
-      ) => {
-        const result = await data.transpiler!.transpile(code, {
-          ignoreText: false,
-          minify,
-          terminator: "$ctx.content",
-        });
-        if (doNotRun) return result;
-        let res = await result.run({ ...data });
-        return res;
-      },
-    ],
-    [
-      "random",
-      (a: number, b: number) => {
-        if (a == b) return a;
-        if (a > b) [a, b] = [b, a];
-        return Math.random() * (b - a + 1) + a;
-      },
-    ],
-    ["pickFromArray", (arr: any[]) => arr[~~(Math.random() * arr.length)]],
-  ] as const;
-
-  public static getGlobalImportFunction(name: GlobalFunctions) {
-    return Transpiler.GlobalImportFunctions.find((v) => v[0] === name);
-  }
-
-  public static GetGlobalImportFunction(name: GlobalFunctions) {
-    return this.getGlobalImportFunction(name);
-  }
 
   private constructor() {}
 

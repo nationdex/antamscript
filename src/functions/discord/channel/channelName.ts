@@ -1,3 +1,4 @@
+import { Channel } from "discord.js";
 import { getDiscordImportedFunctions } from "../../../discordjs/imported";
 import { AntamFunction, ArgType, Code, FunctionType } from "../../../structure";
 export default new AntamFunction({
@@ -17,16 +18,15 @@ export default new AntamFunction({
       save: false,
     },
   ],
-  importFunctions: getDiscordImportedFunctions("findChannel"),
+  importFunctions: [
+    ...getDiscordImportedFunctions("findChannel"),
+    "predicateChannelByIDOrObj",
+  ],
   transpile(ctx, [chnl]) {
-    const predicateCode = `{
-      let chnl = ${chnl.code} || ${Code.reservedNames.discord}.chnl;
-        return !chnl ? null : ((typeof chnl == "string" ? chnl : chnl.id) == channel.id);
-      }`;
     return this.success(
       ctx,
       ArgType.Snowflake,
-      `(f$findChannel(${Code.reservedNames.client}, channel => ${predicateCode})?.name ?? null)`,
+      `(f$findChannel(${Code.reservedNames.client}, channel => f$predicateChannelByIDOrObj(channel, ${chnl.code} || ${Code.reservedNames.discord}.channel))?.name ?? null)`,
     );
   },
 });
