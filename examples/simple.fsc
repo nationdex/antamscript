@@ -1,0 +1,4 @@
+hello $sendMessage[google.com] world!
+$toLowercase[\t\$username[lmao] lol] haha $username is working and $username[] too
+
+$lower[works?]

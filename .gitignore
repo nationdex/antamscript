@@ -13,3 +13,6 @@ bun.lockb
 
 # build output
 coverage
+
+# temp
+.temp

@@ -46,22 +46,25 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "build": "bun build src/index.ts --outdir dist",
+    "build": "bun build src/index.ts --outdir dist --target node --minify",
     "check": "biome check .",
     "dev": "bun run --hot src/index.ts",
     "format": "biome format --write .",
     "start": "bun run src/index.ts",
+    "test": "bun test",
     "typecheck": "bun x @ts-blank-space/tsc"
   },
   "dependencies": {
     "discord.js": "^14.27.0",
     "leac": "^0.7.0",
-    "peberminta": "^0.10.0"
+    "peberminta": "^0.10.0",
+    "uglify-js": "^3.19.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",
     "@types/bun": "^1.4.2",
-    "@types/node": "^26.6.4",
+    "@types/node": "^26.6.6",
+    "@types/uglify-js": "^3.17.5",
     "typescript": "^7.0.2"
   }
 }
