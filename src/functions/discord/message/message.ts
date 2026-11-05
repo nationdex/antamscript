@@ -26,18 +26,10 @@ export default new AntamFunction({
     },
   ],
   transpile(ctx, [index, endIndex]) {
-    if (this.hasFields) {
-      return this.success(
-        ctx,
-        ArgType.String,
-        `(typeof ${endIndex.variable} == "number" ? ${Code.reservedNames.discord}.args.slice(${index.variable}, ${endIndex.variable}).join(" ") : ${Code.reservedNames.discord}.args[${index.variable}])`,
-      );
-    }
-
     return this.success(
       ctx,
       ArgType.String,
-      `${Code.reservedNames.discord}.args.join(" ")`,
+      `( typeof ${index.variable} == "number" ? (typeof ${endIndex.variable} == "number" ? ${Code.reservedNames.discord}.args.slice(${index.variable}, ${endIndex.variable}).join(" ") : ${Code.reservedNames.discord}.args[${index.variable}]) : ${Code.reservedNames.discord}.args.join(" "))`,
     );
   },
 });

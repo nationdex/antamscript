@@ -523,6 +523,7 @@ export class Transpiler {
           : typeof compiled.output === "number"
             ? ArgType[compiled.output]
             : "void";
+      console.log(compiled, arg);
       throw new TypeError(
         `Invalid argument "${arg.name}": expected ${expected.join(" | ") || "a valid value"}, received ${actual}`,
       );

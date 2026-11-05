@@ -69,6 +69,7 @@ export class FunctionManager {
     return Array.from(this.Functions.values()).map((x) => {
       const d = { ...x.data };
       Reflect.deleteProperty(d, "transpile");
+      Reflect.deleteProperty(d, "importFunctions");
       const data = deserialize(new Uint8Array(serialize(d))) as IAntamFunction<any>;
 
       data.args?.map((x) => {

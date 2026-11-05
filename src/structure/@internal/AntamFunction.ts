@@ -62,6 +62,14 @@ export class AntamFunction<T extends [...IArg[]] = IArg[]> {
   public constructor(public readonly data: IAntamFunction<T>) {
     // @ts-ignore
     this.async = data.transpile[Symbol.toStringTag] === "AsyncFunction";
+
+    if (this.data.args)
+      this.data.args = this.data.args.map((arg) => ({
+        condition: false,
+        raw: false,
+        required: false,
+        ...arg,
+      })) as unknown as [...T];
   }
 
   public get name() {

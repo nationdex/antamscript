@@ -1,4 +1,4 @@
-import { AntamClient } from "../src";
+import { AntamClient, FunctionManager, IArg, Parser } from "../src";
 
 const client = new AntamClient({
   events: ["clientReady", "messageCreate"],
@@ -23,14 +23,16 @@ client.commands.add({
 client.commands.add({
   type: "messageCreate",
   name: "eval",
+  aliases: ["e"],
   code: `
-  $let[result;$eval[$message]]
-  $!sendMessage[$channelID;eval -> $get[result];false]
+  $if[$authorID==910837428862984213;$let[a;$eval[$message]]]
+  $get[a]
   `,
 });
 client.commands.add({
   type: "messageCreate",
-  name: "code",
+  name: "transpile",
+  aliases: ["t"],
   code: `
   $let[code;$message]
   $let[toMinify;false]
@@ -42,11 +44,30 @@ client.commands.add({
   $sendMessage[$channelID;\`\`\`js\n$get[result]\n\`\`\`;false]
   `,
 });
-
+const functionList = FunctionManager.toJSON()
+  .map(
+    (x) =>
+      `\`${Parser.GlobalFunctionConfig.functionHead + x.name}${
+        x.brackets == undefined
+          ? ""
+          : Parser.GlobalFunctionConfig.parentheses[0] +
+            (x.args ?? [])
+              ?.map(
+                (x: IArg) =>
+                  `${x.rest ? "..." : ""}${x.name}${!x.required ? "?" : ""}`,
+              )
+              .join(Parser.GlobalFunctionConfig.argSplitter) +
+            Parser.GlobalFunctionConfig.parentheses[1]
+      }\``,
+  )
+  .sort()
+  .join("\n");
 client.commands.add({
   type: "messageCreate",
-  name: "sum",
-  code: `$sum[30;20] $executionTimems
+  name: "functions",
+  aliases: ["f"],
+  code: `
+  $esc[>>> ${functionList}]
   `,
 });
 

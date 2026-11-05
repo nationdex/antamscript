@@ -46,7 +46,7 @@ export default new AntamFunction({
     "predicateChannelByIDOrObj",
   ],
   async transpile(ctx, [chnlID, content, returnMessage]) {
-    const code = `await f$sendMessage(${Code.reservedNames.context}, f$findChannel(${Code.reservedNames.client}, channel => f$predicateChannelByIDOrObj(channel, ${chnlID.code}||null)), ${content.code}, ${returnMessage.code})`;
+    const code = `await f$sendMessage(${Code.reservedNames.context}, f$findChannel(${Code.reservedNames.client}, channel => f$predicateChannelByIDOrObj(channel, ${chnlID.variable}||null)), ${content.code}, ${returnMessage.code})`;
     return this.success(ctx, [ArgType.Message, "void"], code);
   },
 });

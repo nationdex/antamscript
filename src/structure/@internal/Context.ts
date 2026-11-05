@@ -16,6 +16,12 @@ export class Context {
     this.scope = data.scope == "global" ? Scope.globalScope() : data.scope;
   }
 
+  public clone() {
+    return new Context({
+      scope: this.scope.clone(),
+    });
+  }
+
   public toJSON() {
     return {
       scope: this.scope.toJSON(),

@@ -31,13 +31,15 @@ export class Scope {
 
   public setVariable(name: string, value: unknown, constant = false) {
     const current = this.variables.get(name);
-    if (current?.constant) throw new TypeError(`Cannot reassign constant "${name}"`);
+    if (current?.constant)
+      throw new TypeError(`Cannot reassign constant "${name}"`);
     this.variables.set(name, { value, constant });
   }
 
   public getVariable(name: string) {
     const variable = this.variables.get(name);
-    if (!variable) throw new ReferenceError(`Variable "${name}" is not defined`);
+    if (!variable)
+      throw new ReferenceError(`Variable "${name}" is not defined`);
     return variable.value;
   }
 
@@ -47,6 +49,19 @@ export class Scope {
 
   public deleteVariable(name: string) {
     return this.variables.delete(name);
+  }
+
+  clone() {
+    let scope = new Scope({
+      name: this.name,
+    });
+    this.functions.forEach((f, name) => {
+      scope.addFunction(name, f);
+    });
+    this.variables.forEach((v, name) => {
+      scope.setVariable(name, v.value, v.constant);
+    });
+    return scope;
   }
 
   toJSON(): ScopeJSON {

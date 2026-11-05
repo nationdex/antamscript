@@ -20,7 +20,7 @@ export const GlobalImportedFunctions = {
       terminator: "$ctx.content",
     });
     if (doNotRun) return result;
-    let res = await result.run({ ...data });
+    let res = await result.run({ ...data, ctx: data.ctx!.clone() });
     return res;
   },
   random: (a: number, b: number) => {
