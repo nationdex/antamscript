@@ -16,7 +16,7 @@ export function minifyCode(code: string, fix = 2, toplevel = true): string {
       drop_console: false,
     },
     output: {
-      comments: /^[*!]/,
+      comments: /^!/,
       preamble: `/* AntamScript@${version} */`,
     },
   });
