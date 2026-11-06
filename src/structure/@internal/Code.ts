@@ -1,4 +1,4 @@
-import { Parser } from "../../core";
+import { Parser } from "../../core/Parser";
 
 // biome-ignore lint/complexity/noStaticOnlyClass: Code is the static code-generation API.
 export class Code {

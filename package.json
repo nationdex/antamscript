@@ -52,7 +52,8 @@
     "format": "biome format --write .",
     "start": "bun run src/index.ts",
     "test": "bun test",
-    "typecheck": "bun x @ts-blank-space/tsc"
+    "typecheck": "bun x @ts-blank-space/tsc",
+    "docgen": "bun run build && bun run src/docgen.ts"
   },
   "dependencies": {
     "discord.js": "^14.27.0",

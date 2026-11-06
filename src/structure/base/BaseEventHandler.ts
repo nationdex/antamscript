@@ -1,5 +1,5 @@
 import { GatewayIntentsString } from "discord.js";
-import { AntamClient } from "../../core";
+import type { AntamClient } from "../../core/AntamClient";
 
 export type AssertArgs<T> = T extends unknown[] ? T : never;
 

@@ -58,6 +58,7 @@ export interface IAntamFunction<T extends [...IArg[]]> {
 export class AntamFunction<T extends [...IArg[]] = IArg[]> {
   public readonly async: boolean;
   public path!: string;
+  public category: string[] | null = null;
 
   public constructor(public readonly data: IAntamFunction<T>) {
     // @ts-ignore

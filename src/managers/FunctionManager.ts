@@ -1,5 +1,8 @@
 import { deserialize, serialize } from "node:v8";
-import { AntamFunction, IAntamFunction } from "../structure/@internal/AntamFunction";
+import {
+  AntamFunction,
+  IAntamFunction,
+} from "../structure/@internal/AntamFunction";
 import { Arrayable } from "../utils/typings";
 import readdir from "../utils/readdir";
 import { ArgType, IArg } from "../structure/@internal/Arg";
@@ -7,6 +10,7 @@ import { ISimplifiedFunctionDefination, Parser } from "../core";
 import { enumToArray } from "../utils/enum";
 import { createRequire } from "node:module";
 import nativeFunctions from "../functions/list";
+import { relative } from "node:path";
 
 const require = createRequire(import.meta.url);
 
@@ -24,9 +28,15 @@ export class FunctionManager {
 
     const overrideAttempts = new Array<string>();
     const loader = new Array<AntamFunction<any>>();
-    for (const file of readdir(path).filter((x) => x.endsWith(".js") || x.endsWith(".ts"))) {
+    for (const file of readdir(path).filter(
+      (x) => x.endsWith(".js") || x.endsWith(".ts"),
+    )) {
       const req = require(file).default as AntamFunction<any>;
       req.path = file;
+      const category = relative(path, file)
+        .split("\\")
+        .slice(0, -1)
+      req.category = category;
 
       if (this.Functions.has(req.name)) {
         overrideAttempts.push(req.name);
@@ -67,10 +77,12 @@ export class FunctionManager {
 
   public static toJSON(): IAntamFunction<any>[] {
     return Array.from(this.Functions.values()).map((x) => {
-      const d = { ...x.data };
+      const d = { ...x.data, category: x.category };
       Reflect.deleteProperty(d, "transpile");
       Reflect.deleteProperty(d, "importFunctions");
-      const data = deserialize(new Uint8Array(serialize(d))) as IAntamFunction<any>;
+      const data = deserialize(
+        new Uint8Array(serialize(d)),
+      ) as IAntamFunction<any>;
 
       data.args?.map((x) => {
         x.type = ArgType[x.type];
@@ -86,7 +98,9 @@ export class FunctionManager {
   }
 }
 
-export function simplifyFunction(f: AntamFunction<any>): ISimplifiedFunctionDefination {
+export function simplifyFunction(
+  f: AntamFunction<any>,
+): ISimplifiedFunctionDefination {
   const { data } = f;
   return {
     name: data.name,

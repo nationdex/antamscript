@@ -3,8 +3,8 @@
  * Copyright © 2026 BotForge
  */
 
-import { Parser } from "../../core";
-import { TranspiledFunction } from "../@internal/TranspiledFunction";
+import { Parser } from "../../core/Parser";
+import type { TranspiledFunction } from "../@internal/TranspiledFunction";
 
 export type GetErrorArgs<T extends string> = T extends `${infer _L}$${infer _R}`
   ? [unknown, ...GetErrorArgs<_R>]

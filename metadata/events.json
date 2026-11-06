@@ -1,0 +1,1 @@
+[{"name":"clientReady","description":"This event is fired when the bot becomes ready"},{"name":"messageCreate","description":"Matches configured prefixes and executes matching message commands","intents":["GuildMessages","MessageContent"]}]

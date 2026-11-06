@@ -1,5 +1,5 @@
 import { ClientEvents } from "discord.js";
-import { AntamClient } from "../core";
+import type { AntamClient } from "../core/AntamClient";
 import { BaseEventHandler } from "../structure";
 
 export class DiscordEventHandler<
