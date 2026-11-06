@@ -1,19 +1,22 @@
 import { inspect } from "util";
 import { AntamFunction, FunctionOutputType } from "..";
 import { FunctionNode, FunctionOperator } from "../../core";
-import { Node } from "../../core/Parser";
+import { Node, Parser } from "../../core/Parser";
 import { FunctionManager } from "../../managers";
-import { ArgType, getArgName, IArg, UnwrapArgs, UnwrapArgsName, UnwrapArgsType } from "./Arg";
+import { ArgType, getArgName, IArg, UnwrapArgs } from "./Arg";
 import { Code } from "./Code";
 import { Context } from "./Context";
 import { Return, ReturnType, ReturnValue } from "./Return";
+import { AntamError, ErrorType } from "../antam/AntamError";
 
 export type WrappedCode = (args: unknown[]) => string;
 export type WrappedConditionCode = (lhs: unknown, rhs: unknown) => string;
 
 export interface ITranspiledFunction {
   node: FunctionNode;
-  fields: null | (ITranspiledFunctionField | ITranspiledFunctionConditionField)[];
+  fields:
+    | null
+    | (ITranspiledFunctionField | ITranspiledFunctionConditionField)[];
 }
 
 export interface ITranspiledFunctionField {
@@ -34,20 +37,40 @@ export enum OperatorType {
   None = "unknown",
 }
 
-export const Operators = new Set<OperatorType>(Object.values(OperatorType) as OperatorType[]);
+export const Operators = new Set<OperatorType>(
+  Object.values(OperatorType) as OperatorType[],
+);
 
 export const Conditions: Record<OperatorType, WrappedConditionCode> = {
   unknown: (lhs) => `Boolean(${lhs})`,
-  "!=": (lhs, rhs) => Code.comparisonExpression([lhs, false], [rhs, false], "!=="),
-  "==": (lhs, rhs) => Code.comparisonExpression([lhs, false], [rhs, false], "=="),
+  "!=": (lhs, rhs) =>
+    Code.comparisonExpression([lhs, false], [rhs, false], "!=="),
+  "==": (lhs, rhs) =>
+    Code.comparisonExpression([lhs, false], [rhs, false], "=="),
   "<": (lhs, rhs) =>
-    Code.comparisonExpression([`Number(${lhs})`, false], [`Number(${rhs})`, false], "<"),
+    Code.comparisonExpression(
+      [`Number(${lhs})`, false],
+      [`Number(${rhs})`, false],
+      "<",
+    ),
   "<=": (lhs, rhs) =>
-    Code.comparisonExpression([`Number(${lhs})`, false], [`Number(${rhs})`, false], "<="),
+    Code.comparisonExpression(
+      [`Number(${lhs})`, false],
+      [`Number(${rhs})`, false],
+      "<=",
+    ),
   ">": (lhs, rhs) =>
-    Code.comparisonExpression([`Number(${lhs})`, false], [`Number(${rhs})`, false], ">"),
+    Code.comparisonExpression(
+      [`Number(${lhs})`, false],
+      [`Number(${rhs})`, false],
+      ">",
+    ),
   ">=": (lhs, rhs) =>
-    Code.comparisonExpression([`Number(${lhs})`, false], [`Number(${rhs})`, false], ">="),
+    Code.comparisonExpression(
+      [`Number(${lhs})`, false],
+      [`Number(${rhs})`, false],
+      ">=",
+    ),
 };
 
 export interface ITranspiledFunctionConditionField {
@@ -81,6 +104,10 @@ export class TranspiledFunction<T extends [...IArg[]] = IArg[]> {
 
   public hasField(i: number) {
     return this.data.fields?.[i] != null;
+  }
+
+  public get display() {
+    return `${Parser.GlobalFunctionConfig.functionHead}${this.fn.name}${this.hasFields ? `${Parser.GlobalFunctionConfig.parentheses[0]}${this.data.fields?.map((f) => f.code).join(Parser.GlobalFunctionConfig.argSplitter)}${Parser.GlobalFunctionConfig.parentheses[1]}` : ""}`;
   }
 
   /**
@@ -151,12 +178,14 @@ export class TranspiledFunction<T extends [...IArg[]] = IArg[]> {
   }
 
   public error(ctx: Context, err: Error | string): Return<ReturnType.Error> {
-    if (typeof err == "string") err = new Error(err);
+    if (typeof err === "string") err = new AntamError(this, ErrorType.Custom, err);
     return new Return(ReturnType.Error, "void", err, ctx);
   }
 
   public async execute(ctx: Context): Promise<Return> {
-    this.fn.importFunctions.forEach(([name, f]) => ctx.scope.addFunction(name, f));
+    this.fn.importFunctions.forEach(([name, f]) =>
+      ctx.scope.addFunction(name, f),
+    );
     const resolved = await this.resolveArgs(ctx);
     if (!resolved.success) return resolved;
     return this.fn.transpile.call(this, ctx, resolved.value as UnwrapArgs<T>);
@@ -181,7 +210,10 @@ export class TranspiledFunction<T extends [...IArg[]] = IArg[]> {
       const field = this.resolveArg(i);
       if (!field) {
         if (def.required)
-          return this.error(ctx, `"${this.fn.name}" is missing argument "${def.name}"`);
+          return this.error(
+            ctx,
+            new AntamError(this, ErrorType.MissingArg, this.fn.name, def.name),
+          );
         args.push(this.pack(def, "undefined"));
         continue;
       }
@@ -204,7 +236,11 @@ export class TranspiledFunction<T extends [...IArg[]] = IArg[]> {
       ctx,
       ArgType.Json,
       typeof value !== "string"
-        ? JSON.stringify(value, (key, val) => (typeof val === "bigint" ? val.toString() : val), 4)
+        ? JSON.stringify(
+            value,
+            (key, val) => (typeof val === "bigint" ? val.toString() : val),
+            4,
+          )
         : value,
     );
   }
@@ -214,7 +250,11 @@ export class TranspiledFunction<T extends [...IArg[]] = IArg[]> {
     valueType: FunctionOutputType,
     code: ReturnValue<ReturnType.Success> = null,
   ) {
-    let out = this.isNegated() ? "void" : this.isCount() ? ArgType.Number : valueType;
+    let out = this.isNegated()
+      ? "void"
+      : this.isCount()
+        ? ArgType.Number
+        : valueType;
     let countCode: string | null = null,
       negatedCode: string | null = null;
 
@@ -225,7 +265,9 @@ export class TranspiledFunction<T extends [...IArg[]] = IArg[]> {
     } else if (
       this.isCount() &&
       this.countOperatorSplitter() &&
-      (valueType == ArgType.String || valueType == ArgType.Json || valueType == ArgType.Unknown)
+      (valueType == ArgType.String ||
+        valueType == ArgType.Json ||
+        valueType == ArgType.Unknown)
     ) {
       countCode = `(() => f$countOperator(${code}, ${Code.stringLiteral(this.countOperatorSplitter() ?? ",")}))()`;
       ctx.scope.addFunction(
@@ -233,7 +275,12 @@ export class TranspiledFunction<T extends [...IArg[]] = IArg[]> {
         `(arg, sep) => { const count = (v) => Array.isArray(v) ? v.length : v.split(sep).length; return typeof arg == "function" ? () => { let v = arg(); return count(v); } : count(arg); }`,
       );
     }
-    return new Return(ReturnType.Success, out, negatedCode ?? countCode ?? code, ctx);
+    return new Return(
+      ReturnType.Success,
+      out,
+      negatedCode ?? countCode ?? code,
+      ctx,
+    );
   }
 
   public unsafeSuccess(
@@ -245,15 +292,21 @@ export class TranspiledFunction<T extends [...IArg[]] = IArg[]> {
   }
 
   public isNegated() {
-    return !!this.data.node.operators.find((o) => o.type == FunctionOperator.Negate);
+    return !!this.data.node.operators.find(
+      (o) => o.type == FunctionOperator.Negate,
+    );
   }
 
   public isSilent() {
-    return !!this.data.node.operators.find((o) => o.type == FunctionOperator.Silent);
+    return !!this.data.node.operators.find(
+      (o) => o.type == FunctionOperator.Silent,
+    );
   }
 
   public isCount() {
-    return !!this.data.node.operators.find((o) => o.type == FunctionOperator.Count);
+    return !!this.data.node.operators.find(
+      (o) => o.type == FunctionOperator.Count,
+    );
   }
 
   public countOperatorSplitter() {

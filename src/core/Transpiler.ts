@@ -6,6 +6,8 @@ import {
   type FunctionOutputType,
   FunctionType,
   type IArg,
+  AntamError,
+  ErrorType,
 } from "../structure";
 import {
   Conditions,
@@ -115,6 +117,7 @@ export class Transpiler {
       transpiledCode = [
         `async (${D}) => {`,
         ...bindings,
+        `${Code.reservedNames.context}.startTime = performance.now()`,
         ctx.scope.scopeFunctions(),
         res.code,
         `${Code.reservedNames.context}.content = ${Code.reservedNames.context}.content.trim();`,
@@ -329,10 +332,10 @@ export class Transpiler {
     if (node.type !== "function") return null;
     const functionData = FunctionManager.get(node.name);
     if (!functionData) {
-      throw new Error(`function "${node.name}" not found in registry`);
+      throw new AntamError(null, ErrorType.UnknownFunction, node.name);
     }
     if (node.args == null && functionData.data.brackets === true) {
-      throw new Error(`function requires brackets`);
+      throw new AntamError(functionData, ErrorType.MissingFields, node.name);
     }
     const definedArgs = functionData.data.args ?? [];
     const providedArgs = node.args ?? [];
@@ -340,14 +343,22 @@ export class Transpiler {
       node.args == null && functionData.data.brackets === false;
     const requiredCount = definedArgs.filter((a) => a.required === true).length;
     if (!bracketlessCall && providedArgs.length < requiredCount) {
-      throw new Error(
-        `function "${node.name}" expects at least ${requiredCount} argument(s), but got ${providedArgs.length}`,
+      throw new AntamError(
+        functionData,
+        ErrorType.TooFewArgs,
+        node.name,
+        requiredCount,
+        providedArgs.length,
       );
     }
     const hasRest = definedArgs.some((a) => a.rest === true);
     if (!hasRest && providedArgs.length > definedArgs.length) {
-      throw new Error(
-        `function "${node.name}" expects at most ${definedArgs.length} argument(s), but got ${providedArgs.length}`,
+      throw new AntamError(
+        functionData,
+        ErrorType.TooManyArgs,
+        node.name,
+        definedArgs.length,
+        providedArgs.length,
       );
     }
 
@@ -523,9 +534,12 @@ export class Transpiler {
           : typeof compiled.output === "number"
             ? ArgType[compiled.output]
             : "void";
-      console.log(compiled, arg);
-      throw new TypeError(
-        `Invalid argument "${arg.name}": expected ${expected.join(" | ") || "a valid value"}, received ${actual}`,
+      throw new AntamError(
+        null,
+        ErrorType.InvalidArgType,
+        arg.name,
+        expected.join(" | ") || "a valid value",
+        actual,
       );
     }
   }

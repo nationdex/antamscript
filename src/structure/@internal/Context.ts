@@ -1,5 +1,6 @@
 import { Container } from "../../discordjs/Container";
 import { Scope } from "./Scope";
+import { AntamError, ErrorType, type GetErrorArgs } from "../antam/AntamError";
 
 export interface IContext {
   scope: Scope | "global";
@@ -14,6 +15,17 @@ export class Context {
 
   constructor(data: IContext) {
     this.scope = data.scope == "global" ? Scope.globalScope() : data.scope;
+  }
+
+  public error<T extends ErrorType>(type: T, ...args: GetErrorArgs<T>): never {
+    throw new AntamError(null, type, ...args);
+  }
+
+  public customError(err: Error | string): never {
+    if (typeof err === "string") {
+      throw new AntamError(null, ErrorType.Custom, err);
+    }
+    throw err;
   }
 
   public clone() {

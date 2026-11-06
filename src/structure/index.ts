@@ -6,3 +6,4 @@ export * from "./@internal/Return";
 export * from "./@internal/Scope";
 export * from "./base/BaseCommand";
 export * from "./base/BaseEventHandler";
+export * from "./antam/AntamError";

@@ -1,3 +1,4 @@
+import { EmbedBuilder } from "discord.js";
 import { DiscordEventHandler } from "../../discordjs/DiscordEventHandler";
 import { Context, Scope } from "../../structure";
 
@@ -47,21 +48,38 @@ export default new DiscordEventHandler({
         );
         continue;
       }
-
-      let result = (await transpiled.run({
-        ctx: ctx,
-        client: this,
-        command: command,
-        discord: {
-          message,
-          user: message.author,
-          guild: message.guild || undefined,
-          channel: message.channel,
-          args: args,
-        },
-      })) as Context;
-      if (result.content && result.content.length > 0) {
-        await message.channel.send(result.content);
+      try {
+        let result = (await transpiled.run({
+          ctx: ctx,
+          client: this,
+          command: command,
+          discord: {
+            message,
+            user: message.author,
+            guild: message.guild || undefined,
+            channel: message.channel,
+            args: args,
+          },
+        })) as Context;
+        if (result.content && result.content.length > 0) {
+          await message.channel.send(result.content);
+        }
+      } catch (err: any) {
+        if (message.channel.isSendable()) {
+          message.channel
+            .send({
+              embeds: [
+                new EmbedBuilder()
+                  .setColor(0xf4889a)
+                  .setDescription(err.message ?? `Something went wrong.`)
+                  .setTitle(
+                    `An error occurred while executing command "${command.name}"`,
+                  ),
+              ],
+            })
+            .catch(() => {});
+        }
+        console.error(err);
       }
     }
   },

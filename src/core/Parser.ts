@@ -1,3 +1,5 @@
+import { AntamError, ErrorType } from "../structure/antam/AntamError";
+
 export interface ISimplifiedFunctionDefination {
   name: string;
   aliases?: string[];
@@ -368,11 +370,12 @@ export class Parser {
         }
         return i;
       };
-      throw new Error(
-        `Unknown function at position ${i}: ${input.slice(
-          i,
-          guessEnd(input, nameStart),
-        )}`,
+      const rawUnknown = input.slice(i, guessEnd(input, nameStart));
+      throw new AntamError(
+        rawUnknown,
+        ErrorType.UnknownFunctionAtPosition,
+        i,
+        rawUnknown,
       );
     }
 
@@ -398,8 +401,11 @@ export class Parser {
 
       if (def.params === true) {
         if (!cfg.ignoreMissingArgs) {
-          throw new Error(
-            `Function "$${def.name}" requires arguments at position ${i}`,
+          throw new AntamError(
+            `${Parser.GlobalFunctionConfig.functionHead}${def.name}`,
+            ErrorType.RequiresArgumentsAtPosition,
+            def.name,
+            i,
           );
         }
         continue;

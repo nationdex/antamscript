@@ -75,7 +75,6 @@ describe("AntamClient", () => {
     assert.equal(
       await result.run({
         ctx: new Context({ scope: Scope.globalScope() }),
-        djs: DiscordJS,
         client,
         command,
       }),
@@ -88,7 +87,6 @@ describe("AntamClient", () => {
     assert.equal(
       await nested.run({
         ctx: new Context({ scope: Scope.globalScope() }),
-        djs: DiscordJS,
         client,
         command: null,
       }),
@@ -105,7 +103,6 @@ describe("AntamClient", () => {
     assert.equal(
       await result.run({
         ctx: new Context({ scope: Scope.globalScope() }),
-        djs: DiscordJS,
         client: { user: { id: "12345678901234567" } } as AntamClient,
       }),
       "12345678901234567",
@@ -140,7 +137,6 @@ describe("AntamClient", () => {
     assert.equal(
       await result.run({
         ctx,
-        djs: DiscordJS,
       }),
       "5",
     );
@@ -155,7 +151,6 @@ describe("AntamClient", () => {
     assert.equal(
       await result.run({
         ctx: new Context({ scope: Scope.globalScope() }),
-        djs: DiscordJS,
       }),
       "3",
     );
@@ -171,7 +166,6 @@ describe("AntamClient", () => {
     assert.equal(
       await result.run({
         ctx: new Context({ scope: Scope.globalScope() }),
-        djs: DiscordJS,
       }),
       "bound",
     );

@@ -84,9 +84,7 @@ export const ImportedDiscordFunctions = {
     content: string,
     returnMessage: boolean = true,
   ) => {
-    if (!channel) {
-      throw new Error("Channel not found");
-    }
+    if (!channel) return ctx.customError("Channel not found");
     return ctx.discordContainer
       .send<Message>(channel, content)
       .then((message) => {
