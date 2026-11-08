@@ -1,7 +1,4 @@
-import {
-  getGlobalImportedFunctions,
-  GlobalFunctionsNames,
-} from "../../functions/imported";
+import { getGlobalImportedFunctions, GlobalFunctionsNames } from "../../functions/imported";
 import { Arrayable, EnumLike } from "../../utils/typings";
 import { ArgType, IArg, UnwrapArgs } from "./Arg";
 import { Context } from "./Context";
@@ -13,9 +10,7 @@ export enum FunctionFlags {
   Deprecated,
 }
 
-export type FunctionOutputType<E = any> =
-  | Arrayable<ArgType | EnumLike<E> | "void">
-  | "void";
+export type FunctionOutputType<E = any> = Arrayable<ArgType | EnumLike<E> | "void"> | "void";
 
 export enum FunctionType {
   Scope,
@@ -89,8 +84,7 @@ export class AntamFunction<T extends [...IArg[]] = IArg[]> {
           : (() => {
               const imported = getGlobalImportedFunctions(x);
               const found = imported[0];
-              if (!found)
-                throw new Error(`Global import function "${x}" not found`);
+              if (!found) throw new Error(`Global import function "${x}" not found`);
               return [found[0], `(${found[1].toString()})`];
             })(),
       ) ?? []

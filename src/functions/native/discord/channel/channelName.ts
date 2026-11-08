@@ -1,11 +1,6 @@
 import { Channel } from "discord.js";
 import { getDiscordImportedFunctions } from "../../../../discordjs/imported";
-import {
-  AntamFunction,
-  ArgType,
-  Code,
-  FunctionType,
-} from "../../../../structure";
+import { AntamFunction, ArgType, Code, FunctionType } from "../../../../structure";
 export default new AntamFunction({
   name: "channelName",
   description: "Returns the channel name",
@@ -23,10 +18,7 @@ export default new AntamFunction({
       save: false,
     },
   ],
-  importFunctions: [
-    ...getDiscordImportedFunctions("findChannel"),
-    "predicateChannelByIDOrObj",
-  ],
+  importFunctions: [...getDiscordImportedFunctions("findChannel"), "predicateChannelByIDOrObj"],
   transpile(ctx, [chnl]) {
     return this.success(
       ctx,

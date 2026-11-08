@@ -53,8 +53,7 @@ describe("Transpiler Examples", async () => {
       ctx: new Context({ scope: Scope.globalScope() }),
     });
 
-    const formatted =
-      typeof result === "string" ? result : JSON.stringify(result, null, 2);
+    const formatted = typeof result === "string" ? result : JSON.stringify(result, null, 2);
 
     section("Output", formatted ?? "(void)");
     console.log(` ${C.green}✔ OK${C.reset}\n`);

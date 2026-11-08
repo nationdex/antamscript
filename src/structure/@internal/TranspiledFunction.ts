@@ -14,9 +14,7 @@ export type WrappedConditionCode = (lhs: unknown, rhs: unknown) => string;
 
 export interface ITranspiledFunction {
   node: FunctionNode;
-  fields:
-    | null
-    | (ITranspiledFunctionField | ITranspiledFunctionConditionField)[];
+  fields: null | (ITranspiledFunctionField | ITranspiledFunctionConditionField)[];
 }
 
 export interface ITranspiledFunctionField {
@@ -37,40 +35,20 @@ export enum OperatorType {
   None = "unknown",
 }
 
-export const Operators = new Set<OperatorType>(
-  Object.values(OperatorType) as OperatorType[],
-);
+export const Operators = new Set<OperatorType>(Object.values(OperatorType) as OperatorType[]);
 
 export const Conditions: Record<OperatorType, WrappedConditionCode> = {
   unknown: (lhs) => `Boolean(${lhs})`,
-  "!=": (lhs, rhs) =>
-    Code.comparisonExpression([lhs, false], [rhs, false], "!=="),
-  "==": (lhs, rhs) =>
-    Code.comparisonExpression([lhs, false], [rhs, false], "=="),
+  "!=": (lhs, rhs) => Code.comparisonExpression([lhs, false], [rhs, false], "!=="),
+  "==": (lhs, rhs) => Code.comparisonExpression([lhs, false], [rhs, false], "=="),
   "<": (lhs, rhs) =>
-    Code.comparisonExpression(
-      [`Number(${lhs})`, false],
-      [`Number(${rhs})`, false],
-      "<",
-    ),
+    Code.comparisonExpression([`Number(${lhs})`, false], [`Number(${rhs})`, false], "<"),
   "<=": (lhs, rhs) =>
-    Code.comparisonExpression(
-      [`Number(${lhs})`, false],
-      [`Number(${rhs})`, false],
-      "<=",
-    ),
+    Code.comparisonExpression([`Number(${lhs})`, false], [`Number(${rhs})`, false], "<="),
   ">": (lhs, rhs) =>
-    Code.comparisonExpression(
-      [`Number(${lhs})`, false],
-      [`Number(${rhs})`, false],
-      ">",
-    ),
+    Code.comparisonExpression([`Number(${lhs})`, false], [`Number(${rhs})`, false], ">"),
   ">=": (lhs, rhs) =>
-    Code.comparisonExpression(
-      [`Number(${lhs})`, false],
-      [`Number(${rhs})`, false],
-      ">=",
-    ),
+    Code.comparisonExpression([`Number(${lhs})`, false], [`Number(${rhs})`, false], ">="),
 };
 
 export interface ITranspiledFunctionConditionField {
@@ -183,9 +161,7 @@ export class TranspiledFunction<T extends [...IArg[]] = IArg[]> {
   }
 
   public async execute(ctx: Context): Promise<Return> {
-    this.fn.importFunctions.forEach(([name, f]) =>
-      ctx.scope.addFunction(name, f),
-    );
+    this.fn.importFunctions.forEach(([name, f]) => ctx.scope.addFunction(name, f));
     const resolved = await this.resolveArgs(ctx);
     if (!resolved.success) return resolved;
     return this.fn.transpile.call(this, ctx, resolved.value as UnwrapArgs<T>);
@@ -231,17 +207,21 @@ export class TranspiledFunction<T extends [...IArg[]] = IArg[]> {
     return { variable };
   }
 
-  public successJSON(ctx: Context, value: Record<string, unknown>) {
+  public successJSON(
+    ctx: Context,
+    value: Record<string, unknown> | string,
+    valueType?: FunctionOutputType,
+  ) {
+    ctx.scope.addFunction(
+      "successJSON",
+      `(o) => { let objOrArray = (str) => /^\\[.*\\]$/.test(str) || /^\\{.*\\}$/.test(str); let str = JSON.stringify(o, (key, val) => (typeof val === "bigint" ? val.toString() : val)); return !objOrArray(str) ? JSON.parse(str) /*! types :sob: */ : str; }`,
+    );
     return this.success(
       ctx,
-      ArgType.Json,
-      typeof value !== "string"
-        ? JSON.stringify(
-            value,
-            (key, val) => (typeof val === "bigint" ? val.toString() : val),
-            4,
-          )
-        : value,
+      valueType ?? ArgType.Json,
+      typeof value == "string"
+        ? `f$successJSON(${value}) `
+        : JSON.stringify(value, (key, val) => (typeof val === "bigint" ? val.toString() : val)),
     );
   }
 
@@ -250,11 +230,7 @@ export class TranspiledFunction<T extends [...IArg[]] = IArg[]> {
     valueType: FunctionOutputType,
     code: ReturnValue<ReturnType.Success> = null,
   ) {
-    let out = this.isNegated()
-      ? "void"
-      : this.isCount()
-        ? ArgType.Number
-        : valueType;
+    let out = this.isNegated() ? "void" : this.isCount() ? ArgType.Number : valueType;
     let countCode: string | null = null,
       negatedCode: string | null = null;
 
@@ -265,9 +241,7 @@ export class TranspiledFunction<T extends [...IArg[]] = IArg[]> {
     } else if (
       this.isCount() &&
       this.countOperatorSplitter() &&
-      (valueType == ArgType.String ||
-        valueType == ArgType.Json ||
-        valueType == ArgType.Unknown)
+      (valueType == ArgType.String || valueType == ArgType.Json || valueType == ArgType.Unknown)
     ) {
       countCode = `(() => f$countOperator(${code}, ${Code.stringLiteral(this.countOperatorSplitter() ?? ",")}))()`;
       ctx.scope.addFunction(
@@ -275,12 +249,7 @@ export class TranspiledFunction<T extends [...IArg[]] = IArg[]> {
         `(arg, sep) => { const count = (v) => Array.isArray(v) ? v.length : v.split(sep).length; return typeof arg == "function" ? () => { let v = arg(); return count(v); } : count(arg); }`,
       );
     }
-    return new Return(
-      ReturnType.Success,
-      out,
-      negatedCode ?? countCode ?? code,
-      ctx,
-    );
+    return new Return(ReturnType.Success, out, negatedCode ?? countCode ?? code, ctx);
   }
 
   public unsafeSuccess(
@@ -292,21 +261,15 @@ export class TranspiledFunction<T extends [...IArg[]] = IArg[]> {
   }
 
   public isNegated() {
-    return !!this.data.node.operators.find(
-      (o) => o.type == FunctionOperator.Negate,
-    );
+    return !!this.data.node.operators.find((o) => o.type == FunctionOperator.Negate);
   }
 
   public isSilent() {
-    return !!this.data.node.operators.find(
-      (o) => o.type == FunctionOperator.Silent,
-    );
+    return !!this.data.node.operators.find((o) => o.type == FunctionOperator.Silent);
   }
 
   public isCount() {
-    return !!this.data.node.operators.find(
-      (o) => o.type == FunctionOperator.Count,
-    );
+    return !!this.data.node.operators.find((o) => o.type == FunctionOperator.Count);
   }
 
   public countOperatorSplitter() {

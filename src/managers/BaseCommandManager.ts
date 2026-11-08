@@ -14,9 +14,7 @@ export interface ICommandManagerEvents {
   update: [];
 }
 
-export abstract class BaseCommandManager<
-  T extends string,
-> extends EventEmitter {
+export abstract class BaseCommandManager<T extends string> extends EventEmitter {
   private readonly commands = new Map<T, BaseCommand<T>[]>();
   private readonly paths = new Set<string>();
 
@@ -34,9 +32,7 @@ export abstract class BaseCommandManager<
     }
 
     for (const directory of this.paths) {
-      for (const file of readdir(directory).filter((entry) =>
-        /\.(?:js|ts)$/.test(entry),
-      )) {
+      for (const file of readdir(directory).filter((entry) => /\.(?:js|ts)$/.test(entry))) {
         const path = resolve(file);
         const resolved = require.resolve(path);
         delete require.cache[resolved];
@@ -68,10 +64,7 @@ export abstract class BaseCommandManager<
     return count;
   }
 
-  public get(
-    type: T,
-    filter?: (command: BaseCommand<T>) => boolean,
-  ): BaseCommand<T>[] {
+  public get(type: T, filter?: (command: BaseCommand<T>) => boolean): BaseCommand<T>[] {
     const commands = this.commands.get(type) ?? [];
     return filter ? commands.filter(filter) : [...commands];
   }
@@ -86,10 +79,7 @@ export abstract class BaseCommandManager<
     ...commands: (IBaseCommand<T> | BaseCommand<T>)[]
   ): Promise<void> {
     for (const input of commands) {
-      const command =
-        input instanceof BaseCommand
-          ? input
-          : new BaseCommand<T>({ ...input, path });
+      const command = input instanceof BaseCommand ? input : new BaseCommand<T>({ ...input, path });
       if (path) command.setPath(path);
       command.validate();
 

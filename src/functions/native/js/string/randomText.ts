@@ -1,9 +1,4 @@
-import {
-  AntamFunction,
-  ArgType,
-  AllowedArgTypePreset,
-  FunctionType,
-} from "../../../../structure";
+import { AntamFunction, ArgType, AllowedArgTypePreset, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "randomText",

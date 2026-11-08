@@ -1,4 +1,3 @@
-
 import { FunctionOutputType } from "./AntamFunction";
 import { ArgType } from "./Arg";
 import { Context } from "./Context";
@@ -22,7 +21,7 @@ export class Return<
     public readonly returnType: T,
     public readonly valueType: V,
     public readonly value: ReturnValue<T>,
-    public readonly ctx: Context
+    public readonly ctx: Context,
   ) {}
 
   public get error() {

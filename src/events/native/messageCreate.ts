@@ -4,8 +4,7 @@ import { Context, Scope } from "../../structure";
 
 export default new DiscordEventHandler({
   name: "messageCreate",
-  description:
-    "Matches configured prefixes and executes matching message commands",
+  description: "Matches configured prefixes and executes matching message commands",
   intents: ["GuildMessages", "MessageContent"],
 
   listener: async function (message) {
@@ -25,9 +24,7 @@ export default new DiscordEventHandler({
       const ignoreCase = cmd.data.nameCaseInsensitive !== false;
       const name = ignoreCase ? rawName?.toLowerCase() : rawName;
       const cmdName = ignoreCase ? cmd.name?.toLowerCase() : cmd.name;
-      const aliases = ignoreCase
-        ? cmd.data.aliases?.map((x) => x.toLowerCase())
-        : cmd.data.aliases;
+      const aliases = ignoreCase ? cmd.data.aliases?.map((x) => x.toLowerCase()) : cmd.data.aliases;
 
       // Allow always execute commands
       return (
@@ -43,9 +40,7 @@ export default new DiscordEventHandler({
       });
       const transpiled = command.transpiled;
       if (!transpiled) {
-        console.error(
-          `Command ${command.name} has not been transpiled. Skipping execution.`,
-        );
+        console.error(`Command ${command.name} has not been transpiled. Skipping execution.`);
         continue;
       }
       try {
@@ -72,9 +67,7 @@ export default new DiscordEventHandler({
                 new EmbedBuilder()
                   .setColor(0xf4889a)
                   .setDescription(err.message ?? `Something went wrong.`)
-                  .setTitle(
-                    `An error occurred while executing command "${command.name}"`,
-                  ),
+                  .setTitle(`An error occurred while executing command "${command.name}"`),
               ],
             })
             .catch(() => {});

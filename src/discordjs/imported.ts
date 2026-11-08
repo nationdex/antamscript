@@ -3,8 +3,7 @@ import type { AntamClient } from "../core";
 import type { Context } from "../structure";
 import type { Sendable } from "./typings";
 
-type ImportedFunction =
-  (typeof ImportedDiscordFunctions)[keyof typeof ImportedDiscordFunctions];
+type ImportedFunction = (typeof ImportedDiscordFunctions)[keyof typeof ImportedDiscordFunctions];
 
 export const ImportedDiscordFunctions = {
   findChannelByID: (client: AntamClient, id: string) => {
@@ -17,15 +16,10 @@ export const ImportedDiscordFunctions = {
     return client.guilds.cache.get(id) || null;
   },
   findMessageByID: (client: AntamClient, channel: Channel, id: string) => {
-    return channel && channel.isTextBased()
-      ? channel.messages.cache.get(id) || null
-      : null;
+    return channel && channel.isTextBased() ? channel.messages.cache.get(id) || null : null;
   },
 
-  findChannel: (
-    client: AntamClient,
-    predicate: (channel: Channel) => boolean,
-  ) => {
+  findChannel: (client: AntamClient, predicate: (channel: Channel) => boolean) => {
     return client.channels.cache.find(predicate) || null;
   },
   findUser: (client: AntamClient, predicate: (user: User) => boolean) => {
@@ -61,11 +55,7 @@ export const ImportedDiscordFunctions = {
     return "user" in value ? value.user : value;
   },
 
-  snowflake: (
-    client: AntamClient,
-    snowflake: string,
-    parseAs: "channel" | "user" | "guild",
-  ) => {
+  snowflake: (client: AntamClient, snowflake: string, parseAs: "channel" | "user" | "guild") => {
     switch (parseAs) {
       case "channel":
         return client.channels.cache.get(snowflake) || null;
@@ -85,20 +75,16 @@ export const ImportedDiscordFunctions = {
     returnMessage: boolean = true,
   ) => {
     if (!channel) return ctx.customError("Channel not found");
-    return ctx.discordContainer
-      .send<Message>(channel, content)
-      .then((message) => {
-        if (returnMessage) {
-          return message ?? null;
-        }
-        return null;
-      });
+    return ctx.discordContainer.send<Message>(channel, content).then((message) => {
+      if (returnMessage) {
+        return message ?? null;
+      }
+      return null;
+    });
   },
 } as const;
 
-export function getDiscordImportedFunctions(
-  ...names: (keyof typeof ImportedDiscordFunctions)[]
-) {
+export function getDiscordImportedFunctions(...names: (keyof typeof ImportedDiscordFunctions)[]) {
   const functions: [string, ImportedFunction][] = [];
   for (const name of names) {
     if (name in ImportedDiscordFunctions) {

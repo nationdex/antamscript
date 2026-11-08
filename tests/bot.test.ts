@@ -4,13 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
 import * as DiscordJS from "discord.js";
-import {
-  AntamClient,
-  Context,
-  FileReader,
-  FunctionManager,
-  Scope,
-} from "../src/index";
+import { AntamClient, Context, FileReader, FunctionManager, Scope } from "../src/index";
 import { Transpiler } from "../src/core/Transpiler";
 
 describe("AntamClient", () => {
@@ -158,10 +152,9 @@ describe("AntamClient", () => {
 
   it("binds the runtime data as this in $jsEval", async () => {
     FunctionManager.loadNative();
-    const result = await Transpiler.transpile(
-      '$jsEval[this.ctx ? "bound" : "missing"]',
-      { terminator: "$ctx.content" },
-    );
+    const result = await Transpiler.transpile('$jsEval[this.ctx ? "bound" : "missing"]', {
+      terminator: "$ctx.content",
+    });
 
     assert.equal(
       await result.run({

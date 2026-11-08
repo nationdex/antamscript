@@ -1,10 +1,4 @@
-import {
-  AntamFunction,
-  ArgType,
-  Code,
-  FunctionFlags,
-  FunctionType,
-} from "../../../../structure";
+import { AntamFunction, ArgType, Code, FunctionFlags, FunctionType } from "../../../../structure";
 import type { TranspiledResultRunData } from "../../../../core/Transpiler";
 
 export default new AntamFunction({

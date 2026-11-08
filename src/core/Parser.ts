@@ -101,19 +101,12 @@ export class Parser {
       "#": FunctionOperator.Silent,
       "@": FunctionOperator.Count,
     },
-    operatorOrder: [
-      FunctionOperator.Negate,
-      FunctionOperator.Silent,
-      FunctionOperator.Count,
-    ],
+    operatorOrder: [FunctionOperator.Negate, FunctionOperator.Silent, FunctionOperator.Count],
     ignoreUnknownFunction: false,
     ignoreMissingArgs: false,
   };
   private static funcs: ISimplifiedFunctionDefination[] = [];
-  private static readonly trieCache = new WeakMap<
-    ISimplifiedFunctionDefination[],
-    TrieNode
-  >();
+  private static readonly trieCache = new WeakMap<ISimplifiedFunctionDefination[], TrieNode>();
 
   private constructor() {}
 
@@ -138,16 +131,10 @@ export class Parser {
       cfg: { ...Parser.GlobalFunctionConfig, ...config },
       root,
     };
-    return this.createParsedResult(
-      this.parseNodes(input, 0, ctx, false).nodes,
-      functionsList,
-    );
+    return this.createParsedResult(this.parseNodes(input, 0, ctx, false).nodes, functionsList);
   }
 
-  private static createParsedResult(
-    nodes: Node[],
-    functionsList: ISimplifiedFunctionDefination[],
-  ) {
+  private static createParsedResult(nodes: Node[], functionsList: ISimplifiedFunctionDefination[]) {
     let result: ParsedResult = {
       ast: nodes,
       fns: new Set(),
@@ -176,9 +163,7 @@ export class Parser {
     return l.length === 1 ? l : c;
   }
 
-  private static buildTrie(
-    functions: ISimplifiedFunctionDefination[],
-  ): TrieNode {
+  private static buildTrie(functions: ISimplifiedFunctionDefination[]): TrieNode {
     const root: TrieNode = { children: new Map() };
     for (const def of functions) {
       // Add the main name
@@ -194,11 +179,7 @@ export class Parser {
     return root;
   }
 
-  private static addToTrie(
-    root: TrieNode,
-    name: string,
-    def: ISimplifiedFunctionDefination,
-  ): void {
+  private static addToTrie(root: TrieNode, name: string, def: ISimplifiedFunctionDefination): void {
     let node = root;
     for (let i = 0; i < name.length; i++) {
       const ch = this.fold(name[i]);
@@ -217,8 +198,7 @@ export class Parser {
     pos: number,
     root: TrieNode,
   ): { def: ISimplifiedFunctionDefination; len: number }[] {
-    let found: { def: ISimplifiedFunctionDefination; len: number }[] | null =
-      null;
+    let found: { def: ISimplifiedFunctionDefination; len: number }[] | null = null;
     let node = root;
     for (let i = pos; i < input.length; i++) {
       const next = node.children.get(this.fold(input[i]));
@@ -244,10 +224,7 @@ export class Parser {
         const rawStart = this.rawOffsetForValueIndex(node, valueIndex);
         const { escape } = this.GlobalFunctionConfig;
         if (node.raw.slice(0, rawStart).endsWith(escape)) continue;
-        const rawEnd = this.rawOffsetForValueIndex(
-          node,
-          valueIndex + operator.length,
-        );
+        const rawEnd = this.rawOffsetForValueIndex(node, valueIndex + operator.length);
         const lhs = nodes.slice(0, nodeIndex);
         const rhs = nodes.slice(nodeIndex + 1);
         const lhsText = {
@@ -293,9 +270,7 @@ export class Parser {
   }
 
   private static withoutEmptyText(nodes: Node[]) {
-    return nodes.filter(
-      (node) => node.type !== "text" || node.value.length > 0,
-    );
+    return nodes.filter((node) => node.type !== "text" || node.value.length > 0);
   }
 
   private static matchFunction(
@@ -308,9 +283,7 @@ export class Parser {
 
     let pos = i + cfg.functionHead.length;
     let lastIdx = -1;
-    const states: { pos: number; ops: FunctionOperatorNode[] }[] = [
-      { pos, ops: [] },
-    ];
+    const states: { pos: number; ops: FunctionOperatorNode[] }[] = [{ pos, ops: [] }];
 
     while (pos < input.length) {
       const ch = input[pos];
@@ -331,10 +304,7 @@ export class Parser {
         end = parsed.end;
       }
 
-      const ops = [
-        ...states[states.length - 1].ops,
-        { raw: input.slice(pos, end), type, args },
-      ];
+      const ops = [...states[states.length - 1].ops, { raw: input.slice(pos, end), type, args }];
       states.push({ pos: end, ops });
       lastIdx = idx;
       pos = end;
@@ -371,12 +341,7 @@ export class Parser {
         return i;
       };
       const rawUnknown = input.slice(i, guessEnd(input, nameStart));
-      throw new AntamError(
-        rawUnknown,
-        ErrorType.UnknownFunctionAtPosition,
-        i,
-        rawUnknown,
-      );
+      throw new AntamError(rawUnknown, ErrorType.UnknownFunctionAtPosition, i, rawUnknown);
     }
 
     for (const { def, len } of candidates) {
@@ -417,12 +382,7 @@ export class Parser {
     return null;
   }
 
-  private static parseNodes(
-    input: string,
-    start: number,
-    ctx: Ctx,
-    inArg: boolean,
-  ): NodesResult {
+  private static parseNodes(input: string, start: number, ctx: Ctx, inArg: boolean): NodesResult {
     const { cfg } = ctx;
     const [open, close] = cfg.parentheses;
     const nodes: Node[] = [];

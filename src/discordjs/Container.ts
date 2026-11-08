@@ -23,10 +23,7 @@ export class Container {
 
   constructor(public ctx: Context) {}
 
-  public async send<T = unknown>(
-    obj: Sendable,
-    content?: string,
-  ): Promise<T | null> {
+  public async send<T = unknown>(obj: Sendable, content?: string): Promise<T | null> {
     let res: Promise<unknown>;
     const options = this.getOptions<any>(content);
 
@@ -37,9 +34,7 @@ export class Container {
     if (this.channel && this.channel.isTextBased()) {
       res = (this.channel as TextChannel).send(options);
     } else if (obj instanceof Message) {
-      res = this.edit
-        ? obj.edit(options)
-        : (obj.channel as TextChannel).send(options);
+      res = this.edit ? obj.edit(options) : (obj.channel as TextChannel).send(options);
     } else if (obj instanceof BaseChannel && obj.isTextBased()) {
       res = (obj as TextChannel).send(options);
     } else if (obj instanceof User) {

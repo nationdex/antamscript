@@ -168,9 +168,7 @@ describe("runtime regressions", () => {
   });
 
   it("preserves comments alongside their corresponding argument parts", async () => {
-    const result = await Transpiler.transpile(
-      "$log[before $c[first]middle $c[second]after]",
-    );
+    const result = await Transpiler.transpile("$log[before $c[first]middle $c[second]after]");
 
     const before = result.code.indexOf('"before "');
     const firstComment = result.code.indexOf("/* first */");

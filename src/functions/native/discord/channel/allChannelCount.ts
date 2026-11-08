@@ -7,10 +7,6 @@ export default new AntamFunction({
   type: FunctionType.Getter,
   output: ArgType.Number,
   transpile(ctx) {
-    return this.success(
-      ctx,
-      ArgType.Number,
-      `${Code.reservedNames.client}.channels.cache.size`,
-    );
+    return this.success(ctx, ArgType.Number, `${Code.reservedNames.client}.channels.cache.size`);
   },
 });

@@ -1,9 +1,4 @@
-import {
-  AllowedArgTypePreset,
-  AntamFunction,
-  ArgType,
-  FunctionType,
-} from "../../../../structure";
+import { AllowedArgTypePreset, AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "repeat",
@@ -32,10 +27,6 @@ export default new AntamFunction({
     },
   ],
   transpile(ctx, [text, amount]) {
-    return this.success(
-      ctx,
-      ArgType.String,
-      `${text.code}.repeat(Math.floor(${amount.code}))`,
-    );
+    return this.success(ctx, ArgType.String, `${text.code}.repeat(Math.floor(${amount.code}))`);
   },
 });

@@ -8,12 +8,7 @@ import {
 } from "discord.js";
 import { createRequire } from "node:module";
 import type { Message } from "discord.js";
-import {
-  EventsManager,
-  FunctionManager,
-  NativeCommandManager,
-  NativeEventName,
-} from "../managers";
+import { EventsManager, FunctionManager, NativeCommandManager, NativeEventName } from "../managers";
 import { Context, Scope } from "../structure";
 import { TranspiledResult, Transpiler } from "./Transpiler";
 
@@ -29,10 +24,7 @@ export interface IRawAntamClientOptions extends ClientOptions {
   token?: string;
 }
 
-export interface IAntamClientOptions extends Omit<
-  IRawAntamClientOptions,
-  "prefixes"
-> {
+export interface IAntamClientOptions extends Omit<IRawAntamClientOptions, "prefixes"> {
   prefixes: TranspiledResult[];
 }
 
@@ -67,11 +59,7 @@ export class AntamClient extends Client<true> {
 
   async #init(raw: IRawAntamClientOptions) {
     if (this.options.mobile) {
-      Reflect.set(
-        DefaultWebSocketManagerOptions.identifyProperties,
-        "browser",
-        "Discord iOS",
-      );
+      Reflect.set(DefaultWebSocketManagerOptions.identifyProperties, "browser", "Discord iOS");
     }
 
     FunctionManager.loadNative();
@@ -127,9 +115,7 @@ export class AntamClient extends Client<true> {
       const content = this.options.prefixCaseInsensitive
         ? message.content.toLowerCase()
         : message.content;
-      const candidate = this.options.prefixCaseInsensitive
-        ? prefix.toLowerCase()
-        : prefix;
+      const candidate = this.options.prefixCaseInsensitive ? prefix.toLowerCase() : prefix;
       if (content.startsWith(candidate)) return prefix;
     }
 
@@ -137,8 +123,6 @@ export class AntamClient extends Client<true> {
   }
 
   override login(token?: string | undefined): Promise<string> {
-    return this.#initialization.then(() =>
-      super.login(token ?? this.options.token),
-    );
+    return this.#initialization.then(() => super.login(token ?? this.options.token));
   }
 }

@@ -1,10 +1,4 @@
-import {
-  AntamFunction,
-  ArgType,
-  Code,
-  FunctionFlags,
-  FunctionType,
-} from "../../../../structure";
+import { AntamFunction, ArgType, Code, FunctionFlags, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "eval",

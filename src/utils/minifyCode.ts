@@ -48,8 +48,7 @@ function fixMinifiedCode(code: string, fixAgain = true): string {
 
     // convert all String("text") to "text"
     {
-      match:
-        /(?<![\w$.])String\((?<literal>"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')\)/g,
+      match: /(?<![\w$.])String\((?<literal>"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')\)/g,
       replacement: (_match, groups) => {
         return groups.literal;
       },
@@ -91,9 +90,7 @@ function fixMinifiedCode(code: string, fixAgain = true): string {
       const position = args.at(-3);
       const groups = args.at(-1);
       if (typeof position !== "number" || !groups || typeof groups !== "object")
-        throw new TypeError(
-          "Minifier patch regex must define named capture groups",
-        );
+        throw new TypeError("Minifier patch regex must define named capture groups");
       if (patch.onlyIf && !patch.onlyIf(match, groups)) {
         return match;
       }
@@ -104,7 +101,5 @@ function fixMinifiedCode(code: string, fixAgain = true): string {
     });
   }
 
-  return fixAgain && fixedCode !== code
-    ? fixMinifiedCode(fixedCode, false)
-    : fixedCode;
+  return fixAgain && fixedCode !== code ? fixMinifiedCode(fixedCode, false) : fixedCode;
 }

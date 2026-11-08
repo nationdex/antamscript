@@ -13,6 +13,7 @@ export class Scope {
 
   public functions = new Map<string, string>();
   public variables = new Map<string, { value: unknown; constant: boolean }>();
+  #environment: Record<string, unknown> = {};
 
   constructor(data: IScopeConstructor) {
     this.name = data.name;
@@ -31,15 +32,13 @@ export class Scope {
 
   public setVariable(name: string, value: unknown, constant = false) {
     const current = this.variables.get(name);
-    if (current?.constant)
-      throw new TypeError(`Cannot reassign constant "${name}"`);
+    if (current?.constant) throw new TypeError(`Cannot reassign constant "${name}"`);
     this.variables.set(name, { value, constant });
   }
 
   public getVariable(name: string) {
     const variable = this.variables.get(name);
-    if (!variable)
-      throw new ReferenceError(`Variable "${name}" is not defined`);
+    if (!variable) throw new ReferenceError(`Variable "${name}" is not defined`);
     return variable.value;
   }
 
@@ -51,7 +50,23 @@ export class Scope {
     return this.variables.delete(name);
   }
 
-  clone() {
+  public setEnvironment(key: string | string[], value: unknown) {
+    if (Array.isArray(key)) {
+      Scope.transverseSet(this.#environment, value, ...key);
+    } else {
+      this.#environment[key] = value;
+    }
+  }
+
+  public getEnvironment(...keys: string[]) {
+    return Scope.transverseGet(this.#environment, ...keys);
+  }
+
+  public deleteEnvironment(key: string) {
+    delete this.#environment[key];
+  }
+
+  clone(cloneEnv = false) {
     let scope = new Scope({
       name: this.name,
     });
@@ -61,6 +76,10 @@ export class Scope {
     this.variables.forEach((v, name) => {
       scope.setVariable(name, v.value, v.constant);
     });
+    if (cloneEnv)
+      for (const [key, value] of Object.entries(this.#environment)) {
+        scope.setEnvironment(key, value);
+      }
     return scope;
   }
 
@@ -68,7 +87,6 @@ export class Scope {
     return {
       name: this.name,
       functions: Object.fromEntries(this.functions.entries()),
-
       variables: Object.fromEntries(this.variables.entries()),
     };
   }
@@ -77,5 +95,33 @@ export class Scope {
     return new Scope({
       name: "global",
     });
+  }
+
+  static transverseGet<T = any>(obj: object, ...args: string[]): T | undefined {
+    if (!obj) return obj;
+
+    for (const key of args) {
+      if (!(key in obj)) return undefined;
+      obj = obj[key as keyof typeof obj];
+      if (typeof obj !== "object" || obj === null) break;
+    }
+
+    return obj as T;
+  }
+
+  static transverseSet(obj: object, value: any, ...args: string[]) {
+    if (!obj) return obj;
+
+    let lastKey = args.pop();
+    if (!lastKey) return obj;
+
+    for (const key of args) {
+      if (!(key in obj)) return obj;
+      obj = obj[key as keyof typeof obj];
+      if (typeof obj !== "object" || obj === null) return obj;
+    }
+
+    // @ts-ignore
+    return (obj[lastKey as keyof typeof obj] = value);
   }
 }

@@ -43,9 +43,7 @@ export class AntamError<T extends ErrorType = ErrorType> extends Error {
   public constructor(fn: FunctionReference, type: T, ...args: GetErrorArgs<T>) {
     super(AntamError.make(fn, type, ...args));
     this.name = "AntamError";
-    this.errorType = Object.entries(ErrorType).find(
-      ([_, _val]) => _val === type,
-    )?.[0] as T;
+    this.errorType = Object.entries(ErrorType).find(([_, _val]) => _val === type)?.[0] as T;
     this.fnRef = fn;
     this.rawArgs = args;
   }
@@ -53,11 +51,7 @@ export class AntamError<T extends ErrorType = ErrorType> extends Error {
   public static getFunctionDisplay(fn: FunctionReference): string | null {
     if (!fn) return null;
     if (typeof fn === "string") return fn;
-    if (
-      "display" in fn &&
-      typeof fn.display === "string" &&
-      fn.display.length > 0
-    ) {
+    if ("display" in fn && typeof fn.display === "string" && fn.display.length > 0) {
       return fn.display;
     }
     if ("name" in fn && typeof fn.name === "string") {
@@ -69,11 +63,7 @@ export class AntamError<T extends ErrorType = ErrorType> extends Error {
     return null;
   }
 
-  public static make(
-    fn: FunctionReference,
-    type: ErrorType,
-    ...args: unknown[]
-  ) {
+  public static make(fn: FunctionReference, type: ErrorType, ...args: unknown[]) {
     const res = type.replace(
       this.Regex,
       (match) =>

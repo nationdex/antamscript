@@ -2,8 +2,7 @@ import { AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "random",
-  description:
-    "Returns a random integer between min (inclusive) and max (inclusive)",
+  description: "Returns a random integer between min (inclusive) and max (inclusive)",
   type: FunctionType.Getter,
   output: ArgType.Number,
   brackets: true,

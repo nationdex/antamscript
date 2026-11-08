@@ -45,12 +45,9 @@ export default new AntamFunction({
 
   async transpile(ctx: Context, [conditionArg]) {
     const thenBody = await this.transpileCodeArg(1, ctx, true);
-    if (!thenBody)
-      return this.error(ctx, `"if" failed to transpile then-branch`);
+    if (!thenBody) return this.error(ctx, `"if" failed to transpile then-branch`);
 
-    const thenCode = [thenBody.declarations.join("\n"), thenBody.code]
-      .filter(Boolean)
-      .join("\n");
+    const thenCode = [thenBody.declarations.join("\n"), thenBody.code].filter(Boolean).join("\n");
 
     let code = `if (${conditionArg.code}) { ${thenCode} }`;
 

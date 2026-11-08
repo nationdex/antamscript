@@ -2,12 +2,7 @@ import { readFileSync } from "fs";
 import { describe, it } from "node:test";
 import { join } from "path";
 
-import {
-  FunctionManager,
-  ISimplifiedFunctionDefination,
-  Node,
-  Parser,
-} from "../../src/index";
+import { FunctionManager, ISimplifiedFunctionDefination, Node, Parser } from "../../src/index";
 import { inspect } from "bun";
 import assert from "assert";
 

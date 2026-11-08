@@ -39,9 +39,7 @@ export default new AntamFunction({
     const body = await this.transpileCodeArg(1, ctx);
     if (!body) return this.error(ctx, `"loop" failed to transpile code body`);
 
-    const bodyCode = [body.declarations.join("\n"), body.code]
-      .filter(Boolean)
-      .join("\n");
+    const bodyCode = [body.declarations.join("\n"), body.code].filter(Boolean).join("\n");
 
     const loopCode = Code.forLoop(times.code, bodyCode);
     return this.success(ctx, "void", loopCode);

@@ -1,9 +1,4 @@
-import {
-  AllowedArgTypePreset,
-  AntamFunction,
-  ArgType,
-  FunctionType,
-} from "../../../../structure";
+import { AllowedArgTypePreset, AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "reverseText",
@@ -24,10 +19,6 @@ export default new AntamFunction({
     },
   ],
   transpile(ctx, [text]) {
-    return this.success(
-      ctx,
-      ArgType.String,
-      `Array.from(${text.code}).reverse().join("")`,
-    );
+    return this.success(ctx, ArgType.String, `Array.from(${text.code}).reverse().join("")`);
   },
 });

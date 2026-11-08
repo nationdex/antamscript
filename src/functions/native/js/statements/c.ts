@@ -1,10 +1,5 @@
 import { Parser } from "../../../../core";
-import {
-  AntamFunction,
-  ArgType,
-  AllowedArgTypePreset,
-  FunctionType,
-} from "../../../../structure";
+import { AntamFunction, ArgType, AllowedArgTypePreset, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "c",

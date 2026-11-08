@@ -51,9 +51,7 @@ export class BaseCommand<T extends string = CommandType> {
       throw new TypeError("Command type must be a non-empty event name.");
     }
     if (typeof this.data.code !== "string" || this.data.code.length === 0) {
-      throw new TypeError(
-        `Command "${this.name || "(unnamed)"}" must have non-empty code.`,
-      );
+      throw new TypeError(`Command "${this.name || "(unnamed)"}" must have non-empty code.`);
     }
   }
 }

@@ -1,10 +1,5 @@
 import { randomUUID } from "crypto";
-import {
-  EnumLike,
-  GetEnum,
-  MarkNullableType,
-  MarkRestType,
-} from "../../utils/typings";
+import { EnumLike, GetEnum, MarkNullableType, MarkRestType } from "../../utils/typings";
 import { FunctionOutputType } from "./AntamFunction";
 import type { Channel, Guild, Message, User } from "discord.js";
 
@@ -105,19 +100,8 @@ export type GetArgType<
                         : null;
 
 export type UnwrapArgType<T> =
-  T extends IArg<
-    any,
-    infer Type,
-    infer Required,
-    infer Rest,
-    infer Enum,
-    boolean,
-    infer Raw
-  >
-    ? MarkRestType<
-        MarkNullableType<GetArgType<Type, Enum, Raw>, Required, Rest>,
-        Rest
-      >
+  T extends IArg<any, infer Type, infer Required, infer Rest, infer Enum, boolean, infer Raw>
+    ? MarkRestType<MarkNullableType<GetArgType<Type, Enum, Raw>, Required, Rest>, Rest>
     : never;
 
 export type UnwrapArgsType<T> = T extends [infer L, ...infer R]
@@ -147,9 +131,7 @@ export type UnwrapArg<T> =
         code: Save extends false ? string : never;
       }
     : never;
-export type UnwrapArgs<T> = T extends [infer L, ...infer R]
-  ? [UnwrapArg<L>, ...UnwrapArgs<R>]
-  : [];
+export type UnwrapArgs<T> = T extends [infer L, ...infer R] ? [UnwrapArg<L>, ...UnwrapArgs<R>] : [];
 
 export function getArgName(arg: IArg) {
   return `$a${randomUUID().replaceAll("-", "_")}$_${arg.rest ? "rest" : "unrest"}$_$${arg.required ? "nullnt" : "nullable"}$${arg.name.replace(/[^a-zA-Z0-9$_]/g, "_")}`;

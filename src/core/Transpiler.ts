@@ -74,10 +74,7 @@ interface AllowedArgumentTypes {
 }
 
 export class Transpiler {
-  private static readonly DataKeys: Record<
-    string,
-    keyof TranspiledResultRunData
-  > = {
+  private static readonly DataKeys: Record<string, keyof TranspiledResultRunData> = {
     [Code.reservedNames.context]: "ctx",
     [Code.reservedNames.client]: "client",
     [Code.reservedNames.command]: "command",
@@ -93,16 +90,14 @@ export class Transpiler {
   ): Promise<TranspiledResult> {
     const minify = options.minify !== false;
     const parsed = Parser.parse(code, [], options.parserOptions);
-    if (options.ignoreText === true)
-      parsed.ast = parsed.ast.filter((v) => v.type !== "text");
+    if (options.ignoreText === true) parsed.ast = parsed.ast.filter((v) => v.type !== "text");
 
     const ctx = new Context({
       scope: "global",
     });
     if (options.scopeData) {
       if (options.scopeData.name) ctx.scope.name = options.scopeData.name;
-      for (const [name, fn] of options.scopeData.functions ?? [])
-        ctx.scope.addFunction(name, fn);
+      for (const [name, fn] of options.scopeData.functions ?? []) ctx.scope.addFunction(name, fn);
     }
 
     let transpiledCode: string;
@@ -122,23 +117,16 @@ export class Transpiler {
         res.code,
         `${Code.reservedNames.context}.content = ${Code.reservedNames.context}.content.trim();`,
         `return ${
-          typeof options.terminator === "string"
-            ? options.terminator
-            : Code.reservedNames.context
+          typeof options.terminator === "string" ? options.terminator : Code.reservedNames.context
         };`,
         `}`,
       ].join("\n");
-    } else
-      transpiledCode = `async () => ${JSON.stringify(parsed.ast.map((x) => x.raw).join(""))}`;
+    } else transpiledCode = `async () => ${JSON.stringify(parsed.ast.map((x) => x.raw).join(""))}`;
 
     let minifiedTranspiledCode: string | null = null;
     if (minify) {
       try {
-        minifiedTranspiledCode = minifyCode(
-          `const run = ${transpiledCode};`,
-          2,
-          false,
-        );
+        minifiedTranspiledCode = minifyCode(`const run = ${transpiledCode};`, 2, false);
         const minifiedFunction = minifiedTranspiledCode.match(
           /^(\/\*.*\*\/\n)(?:const|let|var) run=(.+);$/,
         );
@@ -147,9 +135,7 @@ export class Transpiler {
           : null;
       } catch (minifyErr: unknown) {
         console.warn("Minification failed, falling back to original code");
-        console.warn(
-          minifyErr instanceof Error ? minifyErr.message : String(minifyErr),
-        );
+        console.warn(minifyErr instanceof Error ? minifyErr.message : String(minifyErr));
         minifiedTranspiledCode = null; // Fall back to original
       }
     }
@@ -159,8 +145,7 @@ export class Transpiler {
     // Executing the generated function is the transpiler's runtime contract.
     // biome-ignore lint/security/noGlobalEval: the code is generated from validated AST nodes
     const execute = eval(`const f = ${funcstr}; f`) as TranspiledResult["run"];
-    const run: TranspiledResult["run"] = (data) =>
-      execute({ ...data, transpiler: Transpiler });
+    const run: TranspiledResult["run"] = (data) => execute({ ...data, transpiler: Transpiler });
 
     return {
       run,
@@ -183,18 +168,12 @@ export class Transpiler {
 
     for (const node of parsed.ast) {
       if (node.type === "text") {
-        body.push(
-          top
-            ? Code.contextContent.append(node.raw)
-            : Code.stringLiteral(node.raw),
-        );
+        body.push(top ? Code.contextContent.append(node.raw) : Code.stringLiteral(node.raw));
         continue;
       }
 
       const pre: string[] = [];
-      const silent = node.operators.some(
-        (operator) => operator.type === FunctionOperator.Silent,
-      );
+      const silent = node.operators.some((operator) => operator.type === FunctionOperator.Silent);
       try {
         const data = await Transpiler.transpileFunction(node, ctx, pre);
         if (!data) throw new Error(`Function Data not found for ${node.raw}`);
@@ -218,11 +197,7 @@ export class Transpiler {
           }
         }
 
-        body.push(
-          ...(silent
-            ? [`try { ${statements.join("\n")} } catch {}`]
-            : statements),
-        );
+        body.push(...(silent ? [`try { ${statements.join("\n")} } catch {}`] : statements));
       } catch (error) {
         if (!silent) throw error;
       }
@@ -248,15 +223,11 @@ export class Transpiler {
         partComments.push(actualComment);
         actualComment = "";
         outputs.push(ArgType.String);
-        numericParts.push(
-          n.value.trim() === "" || Number.isFinite(Number(n.value)),
-        );
+        numericParts.push(n.value.trim() === "" || Number.isFinite(Number(n.value)));
         if (nodes.length === 1) literal = n.value;
         continue;
       }
-      const silent = n.operators.some(
-        (operator) => operator.type === FunctionOperator.Silent,
-      );
+      const silent = n.operators.some((operator) => operator.type === FunctionOperator.Silent);
       try {
         const nestedPre: string[] = [];
         const data = await Transpiler.transpileFunction(n, ctx, nestedPre);
@@ -266,13 +237,9 @@ export class Transpiler {
         const ret = await fn.execute(ctx);
         if (!ret.success) throw ret.value;
         if (fn.fn.data.type === FunctionType.Scope)
-          throw new TypeError(
-            `Scope function "${n.name}" cannot be used as an argument value`,
-          );
+          throw new TypeError(`Scope function "${n.name}" cannot be used as an argument value`);
         if (ret.valueType === "void" && fn.fn.name !== "c")
-          throw new TypeError(
-            `Function "${n.name}" does not produce an argument value`,
-          );
+          throw new TypeError(`Function "${n.name}" does not produce an argument value`);
 
         const expression = String(ret.value ?? "undefined");
         if (fn.fn.name === "c") {
@@ -282,9 +249,7 @@ export class Transpiler {
           actualComment = "";
           outputs.push(ret.valueType);
           numericParts.push(
-            Transpiler.getAllowedArgumentTypes(ret.valueType).types.has(
-              ArgType.Number,
-            ),
+            Transpiler.getAllowedArgumentTypes(ret.valueType).types.has(ArgType.Number),
           );
           if (silent) {
             const statements = [...nestedPre, ...fn.declarations];
@@ -319,8 +284,7 @@ export class Transpiler {
         actualComment,
       output: parts.length === 1 ? outputs[0] : ArgType.String,
       literal,
-      numericString:
-        parts.length > 1 && numericParts.every((isNumeric) => isNumeric),
+      numericString: parts.length > 1 && numericParts.every((isNumeric) => isNumeric),
     };
   }
 
@@ -339,8 +303,7 @@ export class Transpiler {
     }
     const definedArgs = functionData.data.args ?? [];
     const providedArgs = node.args ?? [];
-    const bracketlessCall =
-      node.args == null && functionData.data.brackets === false;
+    const bracketlessCall = node.args == null && functionData.data.brackets === false;
     const requiredCount = definedArgs.filter((a) => a.required === true).length;
     if (!bracketlessCall && providedArgs.length < requiredCount) {
       throw new AntamError(
@@ -396,13 +359,9 @@ export class Transpiler {
       if (arg.condition) {
         const condition = Parser.parseCondition(providedArgs[i]);
         const lhs = await Transpiler.transpileNodes(condition.lhs, ctx, pre);
-        const rhs = condition.rhs
-          ? await Transpiler.transpileNodes(condition.rhs, ctx, pre)
-          : null;
+        const rhs = condition.rhs ? await Transpiler.transpileNodes(condition.rhs, ctx, pre) : null;
         const conditionCode = (part: CompiledNodes) =>
-          part.literal === undefined
-            ? part.code
-            : Transpiler.conditionLiteralCode(part.literal);
+          part.literal === undefined ? part.code : Transpiler.conditionLiteralCode(part.literal);
         const resolve = Conditions[condition.operator as OperatorType];
         compiled = {
           code: resolve(conditionCode(lhs), rhs ? conditionCode(rhs) : ""),
@@ -414,8 +373,7 @@ export class Transpiler {
       Transpiler.validateArgument(arg, compiled);
       const casted = Transpiler.castArgument(arg, compiled.code);
       fields.push({ code: casted.code, arg, resolve: () => casted.code });
-      for (const [name, fn] of casted.functions)
-        ctx.scope.addFunction(name, `(${fn.toString()})`);
+      for (const [name, fn] of casted.functions) ctx.scope.addFunction(name, `(${fn.toString()})`);
     }
 
     return {
@@ -430,9 +388,7 @@ export class Transpiler {
     return value === undefined ? "undefined" : JSON.stringify(value);
   }
 
-  private static getAllowedArgumentTypes(
-    value: FunctionOutputType,
-  ): AllowedArgumentTypes {
+  private static getAllowedArgumentTypes(value: FunctionOutputType): AllowedArgumentTypes {
     const types = new Set<ArgType>();
     const enumValues = new Set<string | number>();
     let allowVoid = false;
@@ -472,24 +428,17 @@ export class Transpiler {
         allowed.enumValues.size &&
         !allowed.enumValues.has(value) &&
         ![...allowed.enumValues].some(
-          (enumValue) =>
-            typeof enumValue === "number" && String(enumValue) === value,
+          (enumValue) => typeof enumValue === "number" && String(enumValue) === value,
         )
       )
         return false;
 
       for (const type of allowed.types) {
         if (type === ArgType.String || type === ArgType.Unknown) return true;
-        if (
-          type === ArgType.Number &&
-          value.trim() !== "" &&
-          Number.isFinite(Number(value))
-        )
+        if (type === ArgType.Number && value.trim() !== "" && Number.isFinite(Number(value)))
           return true;
-        if (type === ArgType.Boolean && (value === "true" || value === "false"))
-          return true;
-        if (type === ArgType.Snowflake && /^\d{17,20}$/.test(value))
-          return true;
+        if (type === ArgType.Boolean && (value === "true" || value === "false")) return true;
+        if (type === ArgType.Snowflake && /^\d{17,20}$/.test(value)) return true;
         if (type === ArgType.Json) {
           try {
             const parsed = parseStringToData(value);
@@ -503,8 +452,7 @@ export class Transpiler {
           (!allowed.enumValues.size ||
             allowed.enumValues.has(value) ||
             [...allowed.enumValues].some(
-              (enumValue) =>
-                typeof enumValue === "number" && String(enumValue) === value,
+              (enumValue) => typeof enumValue === "number" && String(enumValue) === value,
             ))
         )
           return true;
@@ -526,8 +474,7 @@ export class Transpiler {
 
     if (!valid) {
       const expected = [...allowed.types].map((type) => ArgType[type]);
-      if (allowed.enumValues.size)
-        expected.push(`enum(${[...allowed.enumValues].join(", ")})`);
+      if (allowed.enumValues.size) expected.push(`enum(${[...allowed.enumValues].join(", ")})`);
       const actual =
         compiled.literal !== undefined
           ? typeof parseStringToData(compiled.literal)
@@ -570,24 +517,16 @@ export class Transpiler {
         return {
           code: `f$bool(${code})`,
           functions: [
-            [
-              "bool",
-              (v: any) =>
-                v == "true" ? true : v == "false" ? false : Boolean(v),
-            ],
+            ["bool", (v: any) => (v == "true" ? true : v == "false" ? false : Boolean(v))],
           ],
         };
       case ArgType.Json:
         return {
           code: `f$json(${code})`,
-          functions: [
-            ["json", (v: any) => (typeof v === "string" ? JSON.parse(v) : v)],
-          ],
+          functions: [["json", (v: any) => (typeof v === "string" ? JSON.parse(v) : v)]],
         };
       case ArgType.Enum: {
-        const { enumValues } = Transpiler.getAllowedArgumentTypes(
-          arg.allow ?? arg.type,
-        );
+        const { enumValues } = Transpiler.getAllowedArgumentTypes(arg.allow ?? arg.type);
         if (arg.enum) {
           const enumTypes = Transpiler.getAllowedArgumentTypes(arg.enum);
           for (const value of enumTypes.enumValues) enumValues.add(value);
@@ -602,10 +541,7 @@ export class Transpiler {
                 [
                   "enum",
                   (v: any, allowed: number[]) =>
-                    typeof v === "string" &&
-                    allowed.some((i) => String(i) === v)
-                      ? Number(v)
-                      : v,
+                    typeof v === "string" && allowed.some((i) => String(i) === v) ? Number(v) : v,
                 ],
               ],
             }

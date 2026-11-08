@@ -19,10 +19,6 @@ export default new AntamFunction({
   ],
   transpile(ctx) {
     const args = this.resolveArgsFrom(0);
-    return this.success(
-      ctx,
-      ArgType.Number,
-      `Math.max(${args.map((arg) => arg.code).join(", ")})`,
-    );
+    return this.success(ctx, ArgType.Number, `Math.max(${args.map((arg) => arg.code).join(", ")})`);
   },
 });

@@ -8,12 +8,7 @@ export type GlobalFunctionsNames = keyof typeof GlobalImportedFunctions;
 
 /* special functions */
 export const GlobalImportedFunctions = {
-  eval: async (
-    code: string,
-    data: TranspiledResultRunData,
-    minify: boolean,
-    doNotRun = false,
-  ) => {
+  eval: async (code: string, data: TranspiledResultRunData, minify: boolean, doNotRun = false) => {
     const result = await data.transpiler!.transpile(code, {
       ignoreText: false,
       minify,
@@ -37,21 +32,16 @@ export const GlobalImportedFunctions = {
           ? chnl
           : ("name" in chnl ? chnl.name : chnl.id) || chnl.id
         ).toLowerCase() ==
-          (
-            ("name" in channel ? channel.name : channel.id) || channel.id
-          ).toLowerCase();
+          (("name" in channel ? channel.name : channel.id) || channel.id).toLowerCase();
   },
   predicateChannelByIDOrObj: (channel: Channel, chnl: string | Channel) => {
-    return !chnl
-      ? false
-      : (typeof chnl == "string" ? chnl : chnl.id) == channel.id;
+    return !chnl ? false : (typeof chnl == "string" ? chnl : chnl.id) == channel.id;
   },
 
   predicateGuildByNameOrObj: (guild: Guild, g: string | Guild) => {
     return !g
       ? false
-      : (typeof g == "string" ? g : g.name).toLowerCase() ==
-          guild.name.toLowerCase();
+      : (typeof g == "string" ? g : g.name).toLowerCase() == guild.name.toLowerCase();
   },
   predicateGuildByIDOrObj: (guild: Guild, g: string | Guild) => {
     return !g ? false : (typeof g == "string" ? g : g.id) == guild.id;

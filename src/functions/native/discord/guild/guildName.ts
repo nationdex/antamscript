@@ -1,10 +1,5 @@
 import { getDiscordImportedFunctions } from "../../../../discordjs/imported";
-import {
-  AntamFunction,
-  ArgType,
-  Code,
-  FunctionType,
-} from "../../../../structure";
+import { AntamFunction, ArgType, Code, FunctionType } from "../../../../structure";
 export default new AntamFunction({
   name: "guildName",
   description: "Returns the guild name, or an empty string in direct messages",
@@ -22,10 +17,7 @@ export default new AntamFunction({
       save: false,
     },
   ],
-  importFunctions: [
-    ...getDiscordImportedFunctions("findGuild"),
-    "predicateGuildByIDOrObj",
-  ],
+  importFunctions: [...getDiscordImportedFunctions("findGuild"), "predicateGuildByIDOrObj"],
   transpile(ctx, [guild]) {
     return this.success(
       ctx,

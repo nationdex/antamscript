@@ -52,10 +52,7 @@ const functionList = FunctionManager.toJSON()
           ? ""
           : Parser.GlobalFunctionConfig.parentheses[0] +
             (x.args ?? [])
-              ?.map(
-                (x: IArg) =>
-                  `${x.rest ? "..." : ""}${x.name}${!x.required ? "?" : ""}`,
-              )
+              ?.map((x: IArg) => `${x.rest ? "..." : ""}${x.name}${!x.required ? "?" : ""}`)
               .join(Parser.GlobalFunctionConfig.argSplitter) +
             Parser.GlobalFunctionConfig.parentheses[1]
       }\``,
