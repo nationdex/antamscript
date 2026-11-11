@@ -15,8 +15,7 @@ export interface IMetadataGeneration {
   metadataFolder?: string;
 }
 
-const toSrcPath = (absPath: string) =>
-  relative(cwd(), absPath).replace(/\\/g, "/");
+const toSrcPath = (absPath: string) => relative(cwd(), absPath).replace(/\\/g, "/");
 
 export default async function generateMetadata(options: IMetadataGeneration) {
   const metadataFolder = options.metadataFolder ?? "metadata";
@@ -33,9 +32,7 @@ export default async function generateMetadata(options: IMetadataGeneration) {
       function: options.functionsAbsolutePath
         ? toSrcPath(options.functionsAbsolutePath)
         : undefined,
-      event: options.eventsAbsolutePath
-        ? toSrcPath(options.eventsAbsolutePath)
-        : undefined,
+      event: options.eventsAbsolutePath ? toSrcPath(options.eventsAbsolutePath) : undefined,
     }),
   );
 
@@ -71,10 +68,7 @@ export default async function generateMetadata(options: IMetadataGeneration) {
     });
     console.info(`Loaded ${functionsData.length} functions`);
 
-    writeFileSync(
-      join(metadataFolder, "functions.json"),
-      JSON.stringify(functionsData),
-    );
+    writeFileSync(join(metadataFolder, "functions.json"), JSON.stringify(functionsData));
   }
 
   // Events metadata
@@ -84,13 +78,8 @@ export default async function generateMetadata(options: IMetadataGeneration) {
     const eventsData = EventsManager.toJSON("Metadata");
     console.info(`Loaded ${eventsData.length} events`);
 
-    writeFileSync(
-      join(metadataFolder, "events.json"),
-      JSON.stringify(eventsData),
-    );
+    writeFileSync(join(metadataFolder, "events.json"), JSON.stringify(eventsData));
   }
 
-  console.info(
-    `Metadata successfully generated into "${metadataFolder}" folder.`,
-  );
+  console.info(`Metadata successfully generated into "${metadataFolder}" folder.`);
 }

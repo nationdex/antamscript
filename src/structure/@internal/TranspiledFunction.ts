@@ -209,19 +209,23 @@ export class TranspiledFunction<T extends [...IArg[]] = IArg[]> {
 
   public successJSON(
     ctx: Context,
-    value: Record<string, unknown> | string,
+    value: { json: Record<string, unknown> | string; space?: number },
     valueType?: FunctionOutputType,
   ) {
     ctx.scope.addFunction(
       "successJSON",
-      `(o) => { let objOrArray = (str) => /^\\[.*\\]$/.test(str) || /^\\{.*\\}$/.test(str); let str = JSON.stringify(o, (key, val) => (typeof val === "bigint" ? val.toString() : val)); return !objOrArray(str) ? JSON.parse(str) /*! types :sob: */ : str; }`,
+      `(o, spaces) => { let objOrArray = (str) => /^\\[[\\s\\S]*\\]$/.test(str) || /^\\{[\\s\\S]*\\}$/.test(str); let str = JSON.stringify(o, (key, val) => (typeof val === "bigint" ? val.toString() : val), spaces); return !objOrArray(str) ? JSON.parse(str) /*! types :sob: */ : str; }`,
     );
     return this.success(
       ctx,
       valueType ?? ArgType.Json,
-      typeof value == "string"
-        ? `f$successJSON(${value}) `
-        : JSON.stringify(value, (key, val) => (typeof val === "bigint" ? val.toString() : val)),
+      typeof value.json == "string"
+        ? `f$successJSON(${value.json}, ${value.space}) `
+        : JSON.stringify(
+            value.json,
+            (key, val) => (typeof val === "bigint" ? val.toString() : val),
+            value.space,
+          ),
     );
   }
 

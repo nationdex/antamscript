@@ -24,6 +24,22 @@ export const GlobalImportedFunctions = {
     return Math.random() * (b - a + 1) + a;
   },
   pickFromArray: (arr: any[]) => arr[~~(Math.random() * arr.length)],
+  isValidJSON: (json: string) => {
+    try {
+      JSON.parse(json);
+      return true;
+    } catch {
+      return false;
+    }
+  },
+  parseJSON: (str: unknown, parseNull = true) => {
+    if (typeof str !== "string" || (!parseNull && str === "null")) return str;
+    try {
+      return /^-?\d+(\.\d+)?$/.test(str) ? Number(str) : JSON.parse(str);
+    } catch (error) {
+      return str;
+    }
+  },
 
   predicateChannelByNameOrObj: (channel: Channel, chnl: string | Channel) => {
     return !chnl
