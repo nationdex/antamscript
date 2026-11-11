@@ -1,0 +1,19 @@
+@messageCreate{
+    name: transpile
+    aliases: ["t"]
+    code: 
+      $let[code;$message]
+      $let[result;$transpile[true;$get[code]]]
+      $sendMessage[$channelID;```js
+      $get[result]```;false]
+}
+
+@messageCreate{
+    name: rawtranspile
+    aliases: ["rt"]
+    code: 
+      $let[code;$message]
+      $let[result;$transpile[false;$get[code]]]
+      $sendMessage[$channelID;```js
+      $get[result]```;false]
+}

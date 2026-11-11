@@ -48,7 +48,7 @@
   "scripts": {
     "build": "bun build src/index.ts --outdir dist --target node --minify",
     "check": "biome check .",
-    "dev": "bun run --hot src/index.ts",
+    "dev": "bun run --hot tests/bot/client.ts",
     "format": "biome format --write .",
     "start": "bun run src/index.ts",
     "test": "bun test",
