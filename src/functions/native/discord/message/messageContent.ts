@@ -35,7 +35,7 @@ export default new AntamFunction({
     return this.success(
       ctx,
       ArgType.String,
-      `(f$findMessageByID(${Code.reservedNames.client}, f$findChannel(${Code.reservedNames.client}, channel => f$predicateChannelByIDOrObj(channel, ${chnl.code} || ${Code.reservedNames.discord}.channel)), ${msg.code})?.content ?? null)`,
+      `(f$findMessageByID(${Code.reservedNames.client}, f$findChannel(${Code.reservedNames.client}, channel => f$predicateChannelByIDOrObj(channel, ${chnl.code} || ${Code.reservedNames.discord}.channel)), ${msg.code})?.content ?? ${Code.reservedNames.discord}.message?.content ?? "")`,
     );
   },
 });
