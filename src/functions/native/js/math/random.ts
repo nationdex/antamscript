@@ -12,7 +12,7 @@ export default new AntamFunction({
       description: "The minimum value (inclusive), defaults to 0",
       rest: false,
       type: ArgType.Number,
-      allow: [ArgType.Number],
+      allow: [ArgType.Number, ArgType.String],
       required: false,
       save: false,
     },
@@ -21,7 +21,7 @@ export default new AntamFunction({
       description: "The maximum value (inclusive), defaults to 1",
       rest: false,
       type: ArgType.Number,
-      allow: [ArgType.Number],
+      allow: [ArgType.Number, ArgType.String],
       required: false,
       save: false,
     },
@@ -38,9 +38,7 @@ export default new AntamFunction({
 
   importFunctions: ["random"],
   transpile(ctx, [min, max, decimals]) {
-    const mn = `Number(${min.code} ?? "0")`;
-    const mx = `Number(${max.code} ?? "1")`;
-    const code = `(()=> { const r = f$random(${mn}, ${mx}); return (${decimals.code} ?? false) ? r : Math.floor(r);})()`;
+    const code = `f$random(${min.code} || undefined, ${max.code} || undefined, ${decimals.code} || undefined)`;
     return this.success(ctx, ArgType.Number, code);
   },
 });

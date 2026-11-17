@@ -18,10 +18,18 @@ export const GlobalImportedFunctions = {
     let res = await result.run({ ...data, ctx: data.ctx!.clone() });
     return res;
   },
-  random: (a: number, b: number) => {
+  // random: (a: number, b: number) => {
+  //   if (a == b) return a;
+  //   if (a > b) [a, b] = [b, a];
+  //   return Math.random() * (b - a + 1) + a;
+  // },
+  random: (a?: number, b?: number, decimals: boolean = false) => {
+    if (a === undefined) a = 1;
+    if (b === undefined) [a, b] = [0, a];
     if (a == b) return a;
     if (a > b) [a, b] = [b, a];
-    return Math.random() * (b - a + 1) + a;
+    let value = Math.random() * (b - a + 1) + a;
+    return decimals ? value : ~~value;
   },
   pickFromArray: (arr: any[]) => arr[~~(Math.random() * arr.length)],
   isValidJSON: (json: string) => {
