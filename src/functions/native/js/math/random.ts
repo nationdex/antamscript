@@ -38,8 +38,8 @@ export default new AntamFunction({
 
   importFunctions: ["random"],
   transpile(ctx, [min, max, decimals]) {
-    const mn = `Number(String(${min.code} ?? "0").trim())`;
-    const mx = `Number(String(${max.code} ?? "1").trim())`;
+    const mn = `Number(${min.code} ?? "0")`;
+    const mx = `Number(${max.code} ?? "1")`;
     const code = `(()=> { const r = f$random(${mn}, ${mx}); return (${decimals.code} ?? false) ? r : Math.floor(r);})()`;
     return this.success(ctx, ArgType.Number, code);
   },

@@ -53,7 +53,8 @@
     "start": "bun run src/index.ts",
     "test": "bun test",
     "typecheck": "bun x @ts-blank-space/tsc",
-    "docgen": "bun run build && bun run src/docgen.ts"
+    "docgen": "bun run build && bun run src/docgen.ts",
+    "prepublish": "bun run typecheck && bun run format && bun run docgen"
   },
   "dependencies": {
     "discord.js": "^14.27.0",

@@ -1,5 +1,6 @@
 import UglifyJS from "uglify-js";
 import { version } from "../../package.json";
+import { Code } from "../structure";
 
 type CaptureGroups = Record<string, string>;
 
@@ -10,6 +11,7 @@ interface MinifierPatch {
 }
 
 export function minifyCode(code: string, fix = 2, toplevel = true): string {
+  if (code.includes(Code.contextContent._)) code = minifyCtxContents(code);
   const result = UglifyJS.minify(code, {
     toplevel,
     compress: {
@@ -63,6 +65,34 @@ function fixMinifiedCode(code: string, fixAgain = true): string {
       },
     },
 
+    // convert all Number("123.1") or Number(123.1) to 123.1
+    {
+      match:
+        /(?<![\w$.])Number\((?<quote>["']?)(?<value>[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)\k<quote>\)/g,
+      replacement: (_match, groups) => {
+        return `${groups.value}`;
+      },
+    },
+
+    // Math.floor(integer) or Math.ceil(integer) or Math.round(integer)
+    {
+      match:
+        /(?<![\w$.])Math\.(?<func>floor|ceil|round)\((?<quote>["']?)(?<value>[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)\k<quote>\)/g,
+      replacement: (_match, groups) => {
+        return `${groups.value}`;
+      },
+    },
+
+    // Math.abs(-d) => d
+    // Math.abs(d) => d
+    {
+      match:
+        /(?<![\w$.])Math\.abs\((?<quote>["']?)(?<value>[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)\k<quote>\)/g,
+      replacement: (_match, groups) => {
+        return `${groups.value}`;
+      },
+    },
+
     // convert all Boolean("true") to true and Boolean("false") to false
     // also convert Boolean(true) to true and Boolean(false) to false
     // also Boolean(\d) to true if \d is not 0, and false if \d is 0
@@ -102,4 +132,39 @@ function fixMinifiedCode(code: string, fixAgain = true): string {
   }
 
   return fixAgain && fixedCode !== code ? fixMinifiedCode(fixedCode, false) : fixedCode;
+}
+
+function minifyCtxContents(code: string) {
+  const contentMarker = Code.contextContent._;
+  const regex = new RegExp(`^\\s*${RegExp.escape(contentMarker)}\\s*\\+=[\\s\\S]+""$`);
+  const lines = code.split("\n");
+  const groupedLines: (string | string[])[] = [];
+  let currentBlock: string[] | null = null;
+
+  while (lines.length) {
+    const line = lines.shift();
+    if (!line) continue;
+    if (line.match(regex)) {
+      if (currentBlock) currentBlock.push(line);
+      else currentBlock = [line];
+      continue;
+    }
+    if (currentBlock) groupedLines.push(currentBlock), (currentBlock = null);
+    groupedLines.push(line);
+  }
+
+  let newCode = "";
+  for (const line of groupedLines) {
+    if (!Array.isArray(line)) {
+      newCode += line + "\n";
+      continue;
+    }
+
+    let parts = line.map((l) =>
+      l.replace(new RegExp(`^\\s*${RegExp.escape(contentMarker)}\\s*\\+=`), "").trim(),
+    );
+    newCode += `${contentMarker} += ${parts.map((p) => Code.parenthesize(p)).join("+")}\n`;
+  }
+
+  return newCode;
 }
