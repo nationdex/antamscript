@@ -1,4 +1,4 @@
-import { AntamFunction, ArgType, FunctionType } from "../../../../structure";
+import { AllowedArgTypePreset, AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "message",
@@ -11,6 +11,7 @@ export default new AntamFunction({
       name: "index",
       description: "Zero-based argument index",
       type: ArgType.Number,
+      allow: AllowedArgTypePreset.Number,
       required: false,
       rest: false,
       save: true,
@@ -20,6 +21,7 @@ export default new AntamFunction({
       description: "The end index",
       rest: false,
       type: ArgType.Number,
+      allow: AllowedArgTypePreset.Number,
       required: false,
       save: true,
     },

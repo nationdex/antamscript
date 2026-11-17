@@ -20,6 +20,7 @@ export default new AntamFunction({
       name: "space",
       description: "The space to use",
       type: ArgType.Number,
+      allow: AllowedArgTypePreset.Number,
       rest: false,
       required: false,
       save: false,

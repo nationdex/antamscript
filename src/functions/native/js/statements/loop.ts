@@ -1,4 +1,5 @@
 import {
+  AllowedArgTypePreset,
   AntamFunction,
   ArgType,
   Context,
@@ -29,6 +30,7 @@ export default new AntamFunction({
       rest: false,
       required: true,
       type: ArgType.String,
+      allow: AllowedArgTypePreset.String,
       raw: true,
       save: false,
     },

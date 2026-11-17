@@ -1,4 +1,10 @@
-import { AntamFunction, ArgType, FunctionFlags, FunctionType } from "../../../../structure";
+import {
+  AllowedArgTypePreset,
+  AntamFunction,
+  ArgType,
+  FunctionFlags,
+  FunctionType,
+} from "../../../../structure";
 
 export default new AntamFunction({
   name: "transpile",
@@ -22,6 +28,7 @@ export default new AntamFunction({
       rest: true,
       required: true,
       type: ArgType.String,
+      allow: AllowedArgTypePreset.String,
       save: false,
       raw: false,
     },

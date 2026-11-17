@@ -18,7 +18,7 @@ export enum ArgType {
 }
 
 export const AllowedArgTypePreset = {
-  String: [ArgType.String, ArgType.Enum, ArgType.Boolean, ArgType.Number],
+  String: [ArgType.String, ArgType.Enum, ArgType.Boolean, ArgType.Number, ArgType.Snowflake],
   Any: Object.values(ArgType).filter((x) => typeof x == "number"),
   Boolean: [ArgType.Boolean, ArgType.Number, ArgType.String],
   Snowflake: [
@@ -29,6 +29,7 @@ export const AllowedArgTypePreset = {
     ArgType.User,
     ArgType.String,
   ],
+  Number: [ArgType.Number, ArgType.String],
 };
 
 export interface IArg<

@@ -1,4 +1,4 @@
-import { AntamFunction, ArgType, FunctionType } from "../../../../structure";
+import { AllowedArgTypePreset, AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "jsonEntries",
@@ -11,6 +11,7 @@ export default new AntamFunction({
       name: "variable",
       description: "The variable to get entries from",
       type: ArgType.String,
+      allow: AllowedArgTypePreset.String,
       required: true,
       rest: false,
       save: false,
