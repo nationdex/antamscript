@@ -1,4 +1,4 @@
-import { AntamFunction, ArgType, Code, FunctionType } from "../../../../structure";
+import { AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "executionTime",
@@ -9,7 +9,11 @@ export default new AntamFunction({
     return this.success(
       ctx,
       ArgType.Number,
-      Code.binaryExpression("performance.now()", "-", `${Code.reservedNames.context}.startTime`),
+      this.code.binaryExpression(
+        "performance.now()",
+        "-",
+        `${this.code.reserved("context")}.startTime`,
+      ),
     );
   },
 });

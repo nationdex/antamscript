@@ -44,7 +44,7 @@ export default new AntamFunction({
 
   importFunctions: [["jsonAssign", (json: object, objs: object[]) => Object.assign(json, ...objs)]],
   transpile(ctx, [variable, other, objects]) {
-    const code = `${Code.reservedNames.context}.scope.setEnvironment(${other.code}, f$jsonAssign(${Code.reservedNames.context}.scope.getEnvironment(${variable.code}) || {}, ${objects.code}))`;
+    const code = `${this.code.setEnvironment(other.code, `f$jsonAssign(${this.code.getEnvironment(variable.code)} || {}, ${objects.code})`)}`;
     return this.success(ctx, "void", code);
   },
 });

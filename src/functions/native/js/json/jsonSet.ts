@@ -1,11 +1,4 @@
-import {
-  AllowedArgTypePreset,
-  AntamFunction,
-  ArgType,
-  Code,
-  FunctionType,
-  Scope,
-} from "../../../../structure";
+import { AntamFunction, ArgType, FunctionType, Scope } from "../../../../structure";
 
 export default new AntamFunction({
   name: "jsonSet",
@@ -37,7 +30,7 @@ export default new AntamFunction({
     ],
   ],
   transpile(ctx, [args]) {
-    const code = `f$jsonSet(${Code.reservedNames.context}.scope, ${args.variable})`;
+    const code = `f$jsonSet(${this.code.reserved("context")}.scope, ${args.variable})`;
     return this.success(ctx, "void", code);
   },
 });

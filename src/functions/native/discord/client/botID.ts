@@ -1,4 +1,4 @@
-import { AntamFunction, ArgType, Code, FunctionType } from "../../../../structure";
+import { AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "botID",
@@ -7,6 +7,6 @@ export default new AntamFunction({
   type: FunctionType.Getter,
   output: ArgType.Snowflake,
   transpile(ctx) {
-    return this.success(ctx, ArgType.Snowflake, `${Code.reservedNames.client}.user.id`);
+    return this.success(ctx, ArgType.Snowflake, `${this.code.reserved("client")}.user.id`);
   },
 });

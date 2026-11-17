@@ -1,5 +1,5 @@
 import { getDiscordImportedFunctions } from "../../../../discordjs/imported";
-import { AntamFunction, ArgType, Code, FunctionType } from "../../../../structure";
+import { AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "guildMembersCount",
@@ -23,7 +23,7 @@ export default new AntamFunction({
     return this.success(
       ctx,
       ArgType.Snowflake,
-      `(f$findGuild(${Code.reservedNames.client}, guild => f$predicateGuildByIDOrObj(${guild.code} || ${Code.reservedNames.discord}.guild))?.members.cache.size ?? 0)`,
+      `(f$findGuild(${this.code.reserved("client")}, guild => f$predicateGuildByIDOrObj(${guild.code} || ${this.code.reserved("discord")}.guild))?.members.cache.size ?? 0)`,
     );
   },
 });

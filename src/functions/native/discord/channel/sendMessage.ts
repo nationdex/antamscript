@@ -1,11 +1,5 @@
 import { getDiscordImportedFunctions } from "../../../../discordjs/imported";
-import {
-  AllowedArgTypePreset,
-  AntamFunction,
-  ArgType,
-  Code,
-  FunctionType,
-} from "../../../../structure";
+import { AllowedArgTypePreset, AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "sendMessage",
@@ -46,7 +40,7 @@ export default new AntamFunction({
     "predicateChannelByIDOrObj",
   ],
   async transpile(ctx, [chnlID, content, returnMessage]) {
-    const code = `await f$sendMessage(${Code.reservedNames.context}, f$findChannel(${Code.reservedNames.client}, channel => f$predicateChannelByIDOrObj(channel, ${chnlID.variable}||null)), ${content.code}, ${returnMessage.code})`;
+    const code = `await f$sendMessage(${this.code.reserved("context")}, f$findChannel(${this.code.reserved("client")}, channel => f$predicateChannelByIDOrObj(channel, ${chnlID.variable}||null)), ${content.code}, ${returnMessage.code})`;
     return this.success(ctx, [ArgType.Message, "void"], code);
   },
 });

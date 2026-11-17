@@ -1,11 +1,5 @@
 import { getDiscordImportedFunctions } from "../../../../discordjs/imported";
-import {
-  AllowedArgTypePreset,
-  AntamFunction,
-  ArgType,
-  Code,
-  FunctionType,
-} from "../../../../structure";
+import { AllowedArgTypePreset, AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "channel",
@@ -29,7 +23,7 @@ export default new AntamFunction({
     return this.success(
       ctx,
       ArgType.Channel,
-      `(f$findChannelByID(${Code.reservedNames.client}, ${chnl.code} || ${Code.reservedNames.discord}.channel)?.channel ?? null)`,
+      `(f$findChannelByID(${this.code.reserved("client")}, ${chnl.code} || ${this.code.reserved("discord")}.channel)?.channel ?? null)`,
     );
   },
 });

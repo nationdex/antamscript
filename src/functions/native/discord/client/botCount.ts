@@ -1,4 +1,4 @@
-import { AntamFunction, ArgType, Code, FunctionType } from "../../../../structure";
+import { AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "botCount",
@@ -9,7 +9,7 @@ export default new AntamFunction({
     return this.success(
       ctx,
       ArgType.Number,
-      `${Code.reservedNames.client}.users.cache.filter((u) => u.bot).size`,
+      `${this.code.reserved("client")}.users.cache.filter((u) => u.bot).size`,
     );
   },
 });

@@ -1,5 +1,5 @@
 import { getDiscordImportedFunctions } from "../../../../discordjs/imported";
-import { AntamFunction, ArgType, Code, FunctionType } from "../../../../structure";
+import { AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "channelID",
@@ -23,7 +23,7 @@ export default new AntamFunction({
     return this.success(
       ctx,
       ArgType.Snowflake,
-      `(f$findChannel(${Code.reservedNames.client}, channel => f$predicateChannelByNameOrObj(channel, ${name.code} || ${Code.reservedNames.discord}.channel))?.id ?? null)`,
+      `(f$findChannel(${this.code.reserved("client")}, channel => f$predicateChannelByNameOrObj(channel, ${name.code} || ${this.code.reserved("discord")}.channel))?.id ?? null)`,
     );
   },
 });

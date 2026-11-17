@@ -69,6 +69,8 @@ export class TranspiledFunction<T extends [...IArg[]] = IArg[]> {
   /** `let x = ...;` statements for args with `save: true`. Emit before the function's code. */
   public readonly declarations: string[] = [];
 
+  public code = Code;
+
   public constructor(raw: ITranspiledFunction) {
     this.fn = FunctionManager.get<T>(raw.node.name)!;
     this.data = {

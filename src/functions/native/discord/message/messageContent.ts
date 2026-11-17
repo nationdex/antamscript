@@ -1,5 +1,5 @@
 import { getDiscordImportedFunctions } from "../../../../discordjs/imported";
-import { AntamFunction, ArgType, Code, FunctionType } from "../../../../structure";
+import { AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "messageContent",
@@ -35,7 +35,7 @@ export default new AntamFunction({
     return this.success(
       ctx,
       ArgType.String,
-      `(f$findMessageByID(${Code.reservedNames.client}, f$findChannel(${Code.reservedNames.client}, channel => f$predicateChannelByIDOrObj(channel, ${chnl.code} || ${Code.reservedNames.discord}.channel)), ${msg.code})?.content ?? ${Code.reservedNames.discord}.message?.content ?? "")`,
+      `(f$findMessageByID(${this.code.reserved("client")}, f$findChannel(${this.code.reserved("client")}, channel => f$predicateChannelByIDOrObj(channel, ${chnl.code} || ${this.code.reserved("discord")}.channel)), ${msg.code})?.content ?? ${this.code.reserved("discord")}.message?.content ?? "")`,
     );
   },
 });

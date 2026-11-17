@@ -1,4 +1,5 @@
 import { Parser } from "../../core/Parser";
+import { TranspiledResultRunData } from "../../core/Transpiler";
 
 // biome-ignore lint/complexity/noStaticOnlyClass: Code is the static code-generation API.
 export class Code {
@@ -11,8 +12,8 @@ export class Code {
     data: "__data__",
   } as const;
 
-  static propertyAccess(object: string, property: string): string {
-    return `${Code.parenthesize(object)}[${Code.stringLiteral(property)}]`;
+  static propertyAccess(object: string, ...properties: (string | number)[]): string {
+    return `${Code.parenthesize(object)}${properties.map((p) => `[${typeof p === "string" ? Code.stringLiteral(p) : p}]`).join("")}`;
   }
 
   static callExpression(callee: string, args: string[] = []): string {
@@ -118,5 +119,16 @@ export class Code {
 
   static variablePlaceholder(name: string) {
     return `__$$${name}$$__`;
+  }
+
+  static getEnvironment(...keys: string[]) {
+    return this.callExpression(`${this.reservedNames.context}.scope.getEnvironment`, keys);
+  }
+  static setEnvironment(key: string, value: string) {
+    return this.callExpression(`${this.reservedNames.context}.scope.setEnvironment`, [key, value]);
+  }
+
+  static reserved(key: keyof (typeof Code)["reservedNames"]) {
+    return this.reservedNames[key];
   }
 }

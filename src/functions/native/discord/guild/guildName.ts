@@ -1,5 +1,5 @@
 import { getDiscordImportedFunctions } from "../../../../discordjs/imported";
-import { AntamFunction, ArgType, Code, FunctionType } from "../../../../structure";
+import { AntamFunction, ArgType, FunctionType } from "../../../../structure";
 export default new AntamFunction({
   name: "guildName",
   description: "Returns the guild name, or an empty string in direct messages",
@@ -22,7 +22,7 @@ export default new AntamFunction({
     return this.success(
       ctx,
       ArgType.Snowflake,
-      `(f$findGuild(${Code.reservedNames.client}, guild => f$predicateGuildByIDOrObj(${guild.code} || ${Code.reservedNames.discord}.guild))?.name ?? null )`,
+      `(f$findGuild(${this.code.reserved("client")}, guild => f$predicateGuildByIDOrObj(${guild.code} || ${this.code.reserved("discord")}.guild))?.name ?? null )`,
     );
   },
 });

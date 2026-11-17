@@ -1,10 +1,4 @@
-import {
-  AllowedArgTypePreset,
-  AntamFunction,
-  ArgType,
-  Code,
-  FunctionType,
-} from "../../../../structure";
+import { AllowedArgTypePreset, AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "letMulti",
@@ -34,7 +28,7 @@ export default new AntamFunction({
   ],
   transpile(ctx) {
     const [variable, amount] = this.resolveArgsFrom(0);
-    const scope = `${Code.reservedNames.context}.scope`;
+    const scope = `${this.code.reserved("context")}.scope`;
     const current = `Number(${scope}.getVariable(${variable.code}))`;
     return this.success(
       ctx,

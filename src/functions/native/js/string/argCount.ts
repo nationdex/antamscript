@@ -1,10 +1,4 @@
-import {
-  AllowedArgTypePreset,
-  AntamFunction,
-  ArgType,
-  Code,
-  FunctionType,
-} from "../../../../structure";
+import { AllowedArgTypePreset, AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "argCount",
@@ -38,7 +32,7 @@ export default new AntamFunction({
     return this.success(
       ctx,
       ArgType.Number,
-      `f$argCount(${text.variable} ?? ${Code.reservedNames.discord}.args)`,
+      `f$argCount(${text.variable} ?? ${this.code.reserved("discord")}.args)`,
     );
   },
 });

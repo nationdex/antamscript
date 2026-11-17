@@ -1,4 +1,4 @@
-import { AntamFunction, ArgType, Code, FunctionFlags, FunctionType } from "../../../../structure";
+import { AntamFunction, ArgType, FunctionFlags, FunctionType } from "../../../../structure";
 import type { TranspiledResultRunData } from "../../../../core/Transpiler";
 
 export default new AntamFunction({
@@ -33,7 +33,7 @@ export default new AntamFunction({
     return this.success(
       ctx,
       ArgType.Unknown,
-      `f$jsEval(${Code.joinArguments(code.code)}, ${Code.reservedNames.data})`,
+      `f$jsEval(${this.code.joinArguments(code.code)}, ${this.code.reserved("data")})`,
     );
   },
 });

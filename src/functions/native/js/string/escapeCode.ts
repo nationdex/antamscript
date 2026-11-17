@@ -1,10 +1,4 @@
-import {
-  AllowedArgTypePreset,
-  AntamFunction,
-  ArgType,
-  Code,
-  FunctionType,
-} from "../../../../structure";
+import { AllowedArgTypePreset, AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "escapeCode",
@@ -26,6 +20,6 @@ export default new AntamFunction({
     },
   ],
   transpile(ctx, [text]) {
-    return this.success(ctx, ArgType.String, Code.joinArguments(text.code));
+    return this.success(ctx, ArgType.String, this.code.joinArguments(text.code));
   },
 });

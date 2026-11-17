@@ -1,10 +1,4 @@
-import {
-  AntamFunction,
-  ArgType,
-  AllowedArgTypePreset,
-  Code,
-  FunctionType,
-} from "../../../../structure";
+import { AntamFunction, ArgType, AllowedArgTypePreset, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "toLowerCase",
@@ -26,7 +20,7 @@ export default new AntamFunction({
   ],
 
   transpile(ctx, [values]) {
-    let code = `${Code.joinArguments(values.code)}.toLowerCase()`;
+    let code = `${this.code.joinArguments(values.code)}.toLowerCase()`;
     return this.success(ctx, ArgType.String, code);
   },
 });

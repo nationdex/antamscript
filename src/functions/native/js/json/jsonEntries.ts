@@ -1,11 +1,4 @@
-import {
-  AllowedArgTypePreset,
-  AntamFunction,
-  ArgType,
-  Code,
-  FunctionType,
-  Scope,
-} from "../../../../structure";
+import { AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "jsonEntries",
@@ -25,7 +18,7 @@ export default new AntamFunction({
   ],
 
   transpile(ctx, [variable]) {
-    const code = `(Object.entries(${Code.reservedNames.context}.scope.getEnvironment(${variable.code})) || [])`;
+    const code = `(Object.entres(${this.code.getEnvironment(variable.code)}) || [])`;
     return this.successJSON(
       ctx,
       {

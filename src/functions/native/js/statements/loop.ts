@@ -1,7 +1,6 @@
 import {
   AntamFunction,
   ArgType,
-  Code,
   Context,
   FunctionFlags,
   FunctionType,
@@ -41,7 +40,7 @@ export default new AntamFunction({
 
     const bodyCode = [body.declarations.join("\n"), body.code].filter(Boolean).join("\n");
 
-    const loopCode = Code.forLoop(times.code, bodyCode);
+    const loopCode = this.code.forLoop(times.code, bodyCode);
     return this.success(ctx, "void", loopCode);
   },
 });

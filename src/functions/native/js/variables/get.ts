@@ -1,10 +1,4 @@
-import {
-  AllowedArgTypePreset,
-  AntamFunction,
-  ArgType,
-  Code,
-  FunctionType,
-} from "../../../../structure";
+import { AllowedArgTypePreset, AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "get",
@@ -25,7 +19,7 @@ export default new AntamFunction({
   ],
 
   transpile(ctx, [name]) {
-    const code = `${Code.reservedNames.context}.scope.getVariable(${name.code})`;
+    const code = `${this.code.reserved("context")}.scope.getVariable(${name.code})`;
     return this.success(ctx, ArgType.Unknown, code);
   },
 });

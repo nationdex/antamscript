@@ -1,4 +1,4 @@
-import { AntamFunction, ArgType, Code, FunctionType } from "../../../../structure";
+import { AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "allMembersCount",
@@ -10,7 +10,7 @@ export default new AntamFunction({
     return this.success(
       ctx,
       ArgType.Number,
-      `${Code.reservedNames.client}.guilds.cache.reduce((count, guild) => count + guild.memberCount, 0)`,
+      `${this.code.reserved("client")}.guilds.cache.reduce((count, guild) => count + guild.memberCount, 0)`,
     );
   },
 });

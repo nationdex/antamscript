@@ -1,10 +1,4 @@
-import {
-  AllowedArgTypePreset,
-  AntamFunction,
-  ArgType,
-  Code,
-  FunctionType,
-} from "../../../../structure";
+import { AllowedArgTypePreset, AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "delete",
@@ -28,7 +22,7 @@ export default new AntamFunction({
     return this.success(
       ctx,
       "void",
-      `${Code.reservedNames.context}.scope.deleteVariable(${name.code})`,
+      `${this.code.reserved("context")}.scope.deleteVariable(${name.code})`,
     );
   },
 });

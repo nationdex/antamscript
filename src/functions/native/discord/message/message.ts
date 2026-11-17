@@ -1,4 +1,4 @@
-import { AntamFunction, ArgType, Code, FunctionType } from "../../../../structure";
+import { AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "message",
@@ -28,7 +28,7 @@ export default new AntamFunction({
     return this.success(
       ctx,
       ArgType.String,
-      `( typeof ${index.variable} == "number" ? (typeof ${endIndex.variable} == "number" ? ${Code.reservedNames.discord}.args.slice(${index.variable}, ${endIndex.variable}).join(" ") : ${Code.reservedNames.discord}.args[${index.variable}]) : ${Code.reservedNames.discord}.args.join(" "))`,
+      `( typeof ${index.variable} == "number" ? (typeof ${endIndex.variable} == "number" ? ${this.code.reserved("discord")}.args.slice(${index.variable}, ${endIndex.variable}).join(" ") : ${this.code.reserved("discord")}.args[${index.variable}]) : ${this.code.reserved("discord")}.args.join(" "))`,
     );
   },
 });

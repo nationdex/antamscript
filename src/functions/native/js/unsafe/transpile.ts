@@ -1,11 +1,4 @@
-import {
-  AntamFunction,
-  ArgType,
-  Code,
-  Context,
-  FunctionFlags,
-  FunctionType,
-} from "../../../../structure";
+import { AntamFunction, ArgType, FunctionFlags, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "transpile",
@@ -39,7 +32,7 @@ export default new AntamFunction({
     return this.success(
       ctx,
       ArgType.Unknown,
-      `(await f$eval(${Code.joinArguments(code.code)}, ${Code.reservedNames.data}, ${minify.variable}, true))[${minify.variable} ? "minifiedCode" : "code"]`,
+      `(await f$eval(${this.code.joinArguments(code.code)}, ${this.code.reserved("data")}, ${minify.variable}, true))[${minify.variable} ? "minifiedCode" : "code"]`,
     );
   },
 });

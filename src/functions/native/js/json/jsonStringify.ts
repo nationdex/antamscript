@@ -1,10 +1,4 @@
-import {
-  AllowedArgTypePreset,
-  AntamFunction,
-  ArgType,
-  Code,
-  FunctionType,
-} from "../../../../structure";
+import { AllowedArgTypePreset, AntamFunction, ArgType, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "jsonStringify",
@@ -37,7 +31,7 @@ export default new AntamFunction({
       ctx,
       {
         space: spaces.code == "undefined" ? undefined : (spaces.code as any),
-        json: `${Code.reservedNames.context}.scope.getEnvironment(${variable.code})`,
+        json: this.code.getEnvironment(variable.code),
       },
       ArgType.Json,
     );

@@ -1,4 +1,4 @@
-import { AntamFunction, ArgType, Code, FunctionFlags, FunctionType } from "../../../../structure";
+import { AntamFunction, ArgType, FunctionFlags, FunctionType } from "../../../../structure";
 
 export default new AntamFunction({
   name: "eval",
@@ -24,7 +24,7 @@ export default new AntamFunction({
     return this.success(
       ctx,
       ArgType.Unknown,
-      `await f$eval(${code.code}, ${Code.reservedNames.data}, false)`,
+      `await f$eval(${code.code}, ${this.code.reserved("data")}, false)`,
     );
   },
 });
