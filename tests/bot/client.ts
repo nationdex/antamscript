@@ -1,9 +1,29 @@
-import { AntamClient, FunctionManager, IArg, Parser } from "../../src";
+import { AntamClient, ArgType, FunctionManager, IArg, Parser } from "../../src";
 
 const client = new AntamClient({
   events: ["clientReady", "messageCreate"],
   intents: ["Guilds", "GuildMessages", "MessageContent"],
   prefixes: ["t", "<@$clientID>", "<@!$clientID>"],
+  functions: "./tests/bot/customFunctions",
+});
+
+client.functions.add({
+  name: "discordNitro",
+  code: `$return[https://discord.nitro/$randomString[16]]`,
+});
+client.functions.add({
+  name: "f",
+  brackets: true,
+  args: [
+    "a",
+    {
+      name: "b",
+      type: ArgType.Number,
+      allow: [ArgType.Number],
+      required: true,
+    },
+  ],
+  code: `$return[$sum[$env[a];$multi[$env[b];8]]]`,
 });
 
 client.commands.add({
@@ -22,21 +42,5 @@ client.commands.add({
 });
 
 client.commands.load("./tests/bot/commands");
-
-// client.commands.add({
-//   type: "messageCreate",
-//   name: "transpile",
-//   aliases: ["t"],
-//   code: `
-//   $let[code;$message]
-//   $let[toMinify;false]
-//   $if[$includes[$get[code];--minify];
-//     $let[toMinify;true]
-//     $let[code;$replace[$get[code];--minify;]]
-//   ]
-//   $let[result;$transpile[$get[toMinify];$get[code]]]
-//   $sendMessage[$channelID;\`\`\`js\n$get[result]\n\`\`\`;false]
-//   `,
-// });
 
 client.login(process.env.DISCORD_TOKEN);

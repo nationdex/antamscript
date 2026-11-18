@@ -21,6 +21,6 @@ export default new AntamFunction({
 
   transpile(ctx, [name]) {
     const code = `${this.code.reserved("context")}.scope.getEnvironment(...${name.code})`;
-    return this.successJSON(ctx, { json: code }, ArgType.Json);
+    return this.successJSON(ctx, { json: code }, ArgType.Unknown);
   },
 });

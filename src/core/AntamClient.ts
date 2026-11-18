@@ -8,7 +8,13 @@ import {
 } from "discord.js";
 import { createRequire } from "node:module";
 import type { Message } from "discord.js";
-import { EventsManager, FunctionManager, NativeCommandManager, NativeEventName } from "../managers";
+import {
+  CustomFunctionManager,
+  EventsManager,
+  FunctionManager,
+  NativeCommandManager,
+  NativeEventName,
+} from "../managers";
 import { Context, Scope } from "../structure";
 import { TranspiledResult, Transpiler } from "./Transpiler";
 
@@ -16,6 +22,7 @@ const require = createRequire(import.meta.url);
 
 export interface IRawAntamClientOptions extends ClientOptions {
   commands?: string;
+  functions?: string;
   prefixes?: string[];
   prefixCaseInsensitive?: boolean;
   events?: (keyof ClientEvents)[];
@@ -36,6 +43,7 @@ export class AntamClient extends Client<true> {
 
   public readonly events = new EventsManager(this);
   public readonly commands = new NativeCommandManager(this);
+  public readonly functions = new CustomFunctionManager(this);
   readonly #initialization: Promise<void>;
 
   [x: PropertyKey]: unknown;
@@ -64,6 +72,10 @@ export class AntamClient extends Client<true> {
 
     FunctionManager.loadNative();
     EventsManager.loadNative();
+
+    if (this.options.functions) {
+      await this.functions.load(this.options.functions);
+    }
 
     if (this.options.commands) {
       await this.commands.load(this.options.commands);

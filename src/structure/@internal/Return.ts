@@ -5,13 +5,16 @@ import { Context } from "./Context";
 export enum ReturnType {
   Error,
   Success,
+  Return,
 }
 
 export type ReturnValue<T extends ReturnType> = T extends ReturnType.Error
   ? Error
   : T extends ReturnType.Success
     ? unknown
-    : never;
+    : T extends ReturnType.Return
+      ? Context
+      : never;
 
 export class Return<
   T extends ReturnType = ReturnType,
@@ -29,5 +32,8 @@ export class Return<
   }
   public get success() {
     return this.returnType === ReturnType.Success;
+  }
+  public get return() {
+    return this.returnType === ReturnType.Return;
   }
 }

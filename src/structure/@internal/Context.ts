@@ -9,12 +9,22 @@ export interface IContext {
 export class Context {
   public scope: Scope;
 
+  #returned: unknown;
   public content: string = "";
   public readonly startTime = performance.now();
   public discordContainer = new Container(this);
 
   constructor(data: IContext) {
     this.scope = data.scope == "global" ? Scope.globalScope() : data.scope;
+  }
+
+  public return(value: unknown) {
+    this.#returned = value;
+    return this;
+  }
+
+  public returned<V>() {
+    return this.#returned as V;
   }
 
   public error<T extends ErrorType>(type: T, ...args: GetErrorArgs<T>): never {

@@ -266,6 +266,14 @@ export class TranspiledFunction<T extends [...IArg[]] = IArg[]> {
     return new Return(ReturnType.Success, valueType, value, ctx);
   }
 
+  public return(
+    ctx: Context,
+    valueType: FunctionOutputType,
+    value: ReturnValue<ReturnType.Return>,
+  ) {
+    return new Return(ReturnType.Return, valueType, value, ctx);
+  }
+
   public isNegated() {
     return !!this.data.node.operators.find((o) => o.type == FunctionOperator.Negate);
   }

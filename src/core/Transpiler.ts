@@ -145,7 +145,16 @@ export class Transpiler {
     // Executing the generated function is the transpiler's runtime contract.
     // biome-ignore lint/security/noGlobalEval: the code is generated from validated AST nodes
     const execute = eval(`const f = ${funcstr}; f`) as TranspiledResult["run"];
-    const run: TranspiledResult["run"] = (data) => execute({ ...data, transpiler: Transpiler });
+    const run: TranspiledResult["run"] = async (data) => {
+      const res = (await execute({ ...data, transpiler: Transpiler })) as any;
+      if (res instanceof Context) {
+        const returned = res.returned();
+        if (returned !== undefined && returned !== null) {
+          res.content = String(returned);
+        }
+      }
+      return res;
+    };
 
     return {
       run,
@@ -181,7 +190,7 @@ export class Transpiler {
         const fn = new TranspiledFunction(data);
 
         const ret = await fn.execute(ctx);
-        if (!ret.success) throw ret.value;
+        if (!ret.success && !ret.return) throw ret.value;
 
         const statements = [...pre, ...fn.declarations];
 

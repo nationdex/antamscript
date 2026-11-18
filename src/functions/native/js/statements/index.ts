@@ -2,6 +2,7 @@
 import fn0 from "./c";
 import fn1 from "./if";
 import fn2 from "./loop";
-import fn3 from "./ternary";
+import fn3 from "./return";
+import fn4 from "./ternary";
 
-export default [fn0, fn1, fn2, fn3];
+export default [fn0, fn1, fn2, fn3, fn4];

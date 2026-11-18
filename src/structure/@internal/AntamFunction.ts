@@ -8,6 +8,7 @@ import { TranspiledFunction } from "./TranspiledFunction";
 export enum FunctionFlags {
   Experimental,
   Deprecated,
+  CustomFunction,
 }
 
 export type FunctionOutputType<E = any> = Arrayable<ArgType | EnumLike<E> | "void"> | "void";
