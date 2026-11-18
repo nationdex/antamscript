@@ -18,6 +18,28 @@ yarn add @nationdex/antamscript
 bun add @nationdex/antamscript
 ```
 
+### Client initialization
+
+Create `bot.ts` file
+
+```ts
+import { AntamClient } from "@nationdex/antamscript";
+
+const client = new AntamClient({
+  events: ["messageCreate"],
+  intents: ["Guilds", "GuildMessages", "MessageContent"],
+  prefixes: ["!"],
+});
+client.commands.add({
+  type: "messageCreate",
+  name: "ping",
+  code: "pong! $pingms",
+});
+await client.login(process.env.DISCORD_TOKEN);
+```
+
+Then run the code using `bun run bot.ts`
+
 ## 🛠️ Development
 
 ```bash
@@ -37,24 +59,6 @@ bun run format
 
 # Type check with TypeScript.
 bun run typecheck
-```
-
-### Client initialization
-
-```ts
-import { AntamClient } from "@nationdex/antamscript";
-
-const client = new AntamClient({
-  events: ["messageCreate"],
-  intents: ["Guilds", "GuildMessages", "MessageContent"],
-  prefixes: ["!"],
-});
-await client.commands.add({
-  type: "messageCreate",
-  name: "ping",
-  code: "pong! $pingms",
-});
-await client.login(process.env.DISCORD_TOKEN);
 ```
 
 ### 👷 Maintainers
