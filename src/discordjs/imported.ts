@@ -6,17 +6,26 @@ import type { Sendable } from "./typings";
 type ImportedFunction = (typeof ImportedDiscordFunctions)[keyof typeof ImportedDiscordFunctions];
 
 export const ImportedDiscordFunctions = {
-  findChannelByID: (client: AntamClient, id: string) => {
-    return client.channels.cache.get(id) || null;
+  findChannelByID: (client: AntamClient, idOrChannel: string | Channel) => {
+    return (
+      client.channels.cache.get(typeof idOrChannel === "string" ? idOrChannel : idOrChannel.id) ||
+      null
+    );
   },
-  findUserByID: (client: AntamClient, id: string) => {
-    return client.users.cache.get(id) || null;
+  findUserByID: (client: AntamClient, idOrUser: string | User) => {
+    return client.users.cache.get(typeof idOrUser === "string" ? idOrUser : idOrUser.id) || null;
   },
-  findGuildByID: (client: AntamClient, id: string) => {
-    return client.guilds.cache.get(id) || null;
+  findGuildByID: (client: AntamClient, idOrGuild: string | Guild) => {
+    return (
+      client.guilds.cache.get(typeof idOrGuild === "string" ? idOrGuild : idOrGuild.id) || null
+    );
   },
-  findMessageByID: (client: AntamClient, channel: Channel, id: string) => {
-    return channel && channel.isTextBased() ? channel.messages.cache.get(id) || null : null;
+  findMessageByID: (client: AntamClient, channel: Channel, idOrMessage: string | Message) => {
+    return channel && channel.isTextBased()
+      ? channel.messages.cache.get(
+          typeof idOrMessage === "string" ? idOrMessage : idOrMessage.id,
+        ) || null
+      : null;
   },
 
   findChannel: (client: AntamClient, predicate: (channel: Channel) => boolean) => {
