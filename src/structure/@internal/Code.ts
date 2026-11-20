@@ -12,6 +12,18 @@ export class Code {
     data: "__data__",
   } as const;
 
+  static escapeVariableName(name: string | number) {
+    return `__$$${name.toString().replace(/[^a-zA-Z0-9_]/g, "")}$$__`;
+  }
+
+  static declare(
+    name: string | number,
+    value?: string | number,
+    keyword: "var" | "let" | null = "let",
+  ) {
+    return `${keyword ? keyword + " " : ""}${Code.escapeVariableName(name)} ${value !== undefined ? "= " + value : ""};`;
+  }
+
   static propertyAccess(object: string, ...properties: (string | number)[]): string {
     return `${Code.parenthesize(object)}${properties.map((p) => `[${typeof p === "string" ? Code.stringLiteral(p) : p}]`).join("")}`;
   }

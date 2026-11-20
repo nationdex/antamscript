@@ -201,7 +201,8 @@ export class Transpiler {
             const statement = out.trimEnd().endsWith(";") ? out : `${out};`;
             statements.push(statement);
           } else {
-            if (top) statements.push(Code.contextContent.appendExpr(out));
+            if (top && fn.fn.data.type !== FunctionType.Declaration)
+              statements.push(Code.contextContent.appendExpr(out));
             else statements.push(out);
           }
         }

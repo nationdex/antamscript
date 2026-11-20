@@ -20,6 +20,7 @@ export enum FunctionType {
   Function,
   FunctionGetter,
   ScopeGetter,
+  Declaration,
 }
 
 export type AntamFunctionTranspiler<T extends [...IArg[]]> = (

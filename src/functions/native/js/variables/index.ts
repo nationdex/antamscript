@@ -8,5 +8,6 @@ import fn5 from "./letDivide";
 import fn6 from "./letMulti";
 import fn7 from "./letSub";
 import fn8 from "./letSum";
+import fn9 from "./var";
 
-export default [fn0, fn1, fn2, fn3, fn4, fn5, fn6, fn7, fn8];
+export default [fn0, fn1, fn2, fn3, fn4, fn5, fn6, fn7, fn8, fn9];

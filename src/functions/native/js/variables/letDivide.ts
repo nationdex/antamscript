@@ -2,8 +2,9 @@ import { AllowedArgTypePreset, AntamFunction, ArgType, FunctionType } from "../.
 
 export default new AntamFunction({
   name: "letDivide",
+  aliases: ["varDivide"],
   description: "Divides an existing variable by an amount",
-  type: FunctionType.Setter,
+  type: FunctionType.Declaration,
   output: "void",
   brackets: true,
   args: [
@@ -15,6 +16,7 @@ export default new AntamFunction({
       required: true,
       rest: false,
       save: false,
+      raw: true,
     },
     {
       name: "amount",
@@ -26,14 +28,13 @@ export default new AntamFunction({
       save: false,
     },
   ],
-  transpile(ctx) {
-    const [variable, amount] = this.resolveArgsFrom(0);
-    const scope = `${this.code.reserved("context")}.scope`;
-    const current = `Number(${scope}.getVariable(${variable.code}))`;
-    return this.success(
-      ctx,
-      "void",
-      `${scope}.setVariable(${variable.code}, (${current} / Number(${amount.code})))`,
-    );
+  transpile(ctx, [variable, amount]) {
+    const varName = this.code.unwrapString(variable.code);
+    const id = ctx.scope.getVariableID(varName);
+    if (id === undefined) {
+      return this.error(ctx, `Variable "${varName}" is not defined`);
+    }
+    const code = this.code.escapeVariableName(id);
+    return this.success(ctx, "void", `${code} /= Number(${amount.code})`);
   },
 });

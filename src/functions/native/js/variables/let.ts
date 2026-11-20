@@ -2,9 +2,9 @@ import { AllowedArgTypePreset, AntamFunction, ArgType, FunctionType } from "../.
 
 export default new AntamFunction({
   name: "let",
-  description: "Creates or updates a script variable",
-  type: FunctionType.Setter,
-  output: "void",
+  description: "Creates or updates a variable",
+  type: FunctionType.Declaration,
+  output: ArgType.Unknown,
   brackets: true,
   args: [
     {
@@ -15,6 +15,7 @@ export default new AntamFunction({
       required: true,
       rest: false,
       save: false,
+      raw: true,
     },
     {
       name: "value",
@@ -25,19 +26,19 @@ export default new AntamFunction({
       rest: false,
       save: false,
     },
-    {
-      name: "constant",
-      description: "Whether the variable is constant (cannot be changed later)",
-      type: ArgType.Boolean,
-      allow: AllowedArgTypePreset.Boolean,
-      required: false,
-      rest: false,
-      save: false,
-    },
   ],
 
-  transpile(ctx, [name, value, constant]) {
-    const code = `${this.code.reserved("context")}.scope.setVariable(${name.code}, ${value.code}, Boolean(${constant.code} ?? false))`;
-    return this.success(ctx, "void", code);
+  transpile(ctx, [name, value]) {
+    const varName = this.code.unwrapString(name.code);
+    const existingType = ctx.scope.getVariableType(varName);
+
+    if (existingType === "var") {
+      return this.error(ctx, `Cannot redeclare variable "${varName}" with let`);
+    }
+
+    const alreadyDeclared = ctx.scope.getVariableID(varName, "let");
+    const id = alreadyDeclared ?? ctx.scope.registerVariable(varName, "let");
+    const code = this.code.declare(id, value?.code, alreadyDeclared === undefined ? "let" : null);
+    return this.success(ctx, ArgType.Unknown, code);
   },
 });

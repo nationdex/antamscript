@@ -5,14 +5,21 @@ export interface IScopeConstructor {
 export interface ScopeJSON {
   name: string;
   functions: Record<string, string>;
-  variables: Record<string, { value: unknown; constant: boolean }>;
+  variables: {
+    var: Record<string, number>;
+    let: Record<string, number>;
+  };
 }
 
 export class Scope {
   public name: string;
 
   public functions = new Map<string, string>();
-  public variables = new Map<string, { value: unknown; constant: boolean }>();
+  public variableIDs = {
+    var: {} as Record<string, number>,
+    let: {} as Record<string, number>,
+  };
+  #variableCounter = 0;
   #environment: Record<string, unknown> = {};
 
   constructor(data: IScopeConstructor) {
@@ -30,24 +37,34 @@ export class Scope {
       .join("\n");
   }
 
-  public setVariable(name: string, value: unknown, constant = false) {
-    const current = this.variables.get(name);
-    if (current?.constant) throw new TypeError(`Cannot reassign constant "${name}"`);
-    this.variables.set(name, { value, constant });
+  registerVariable(name: string, type: "var" | "let" = "var") {
+    let id = this.getVariableID(name);
+    if (id === undefined) {
+      id = this.#variableCounter++;
+      this.variableIDs[type][name] = id;
+    }
+    return id;
   }
 
-  public getVariable(name: string) {
-    const variable = this.variables.get(name);
-    if (!variable) throw new ReferenceError(`Variable "${name}" is not defined`);
-    return variable.value;
+  getVariableID(name: string, type?: "var" | "let"): number | undefined {
+    if (type) return name in this.variableIDs[type] ? this.variableIDs[type][name] : undefined;
+    // try finding in both (var > let)
+    return this.getVariableID(name, "var") ?? this.getVariableID(name, "let");
   }
 
-  public hasVariable(name: string) {
-    return this.variables.has(name);
+  getVariableType(name: string): "var" | "let" | undefined {
+    if (name in this.variableIDs.var) return "var";
+    if (name in this.variableIDs.let) return "let";
+    return undefined;
   }
 
-  public deleteVariable(name: string) {
-    return this.variables.delete(name);
+  deleteVariable(varName: string, type?: "var" | "let") {
+    if (type) {
+      delete this.variableIDs[type][varName];
+    } else {
+      this.deleteVariable(varName, "var");
+      this.deleteVariable(varName, "let");
+    }
   }
 
   public setEnvironment(key: string | string[], value: unknown) {
@@ -73,13 +90,15 @@ export class Scope {
     this.functions.forEach((f, name) => {
       scope.addFunction(name, f);
     });
-    this.variables.forEach((v, name) => {
-      scope.setVariable(name, v.value, v.constant);
-    });
     if (cloneEnv)
       for (const [key, value] of Object.entries(this.#environment)) {
         scope.setEnvironment(key, value);
       }
+    scope.variableIDs = {
+      var: { ...this.variableIDs.var },
+      let: { ...this.variableIDs.let },
+    };
+    scope.#variableCounter = this.#variableCounter;
     return scope;
   }
 
@@ -87,7 +106,10 @@ export class Scope {
     return {
       name: this.name,
       functions: Object.fromEntries(this.functions.entries()),
-      variables: Object.fromEntries(this.variables.entries()),
+      variables: {
+        var: { ...this.variableIDs.var },
+        let: { ...this.variableIDs.let },
+      },
     };
   }
 

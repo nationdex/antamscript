@@ -2,9 +2,8 @@ import { AllowedArgTypePreset, AntamFunction, ArgType, FunctionType } from "../.
 
 export default new AntamFunction({
   name: "delete",
-  aliases: ["deleteVariable"],
-  description: "Deletes a script variable",
-  type: FunctionType.Setter,
+  description: "Deletes a variable",
+  type: FunctionType.Declaration,
   output: "void",
   brackets: true,
   args: [
@@ -16,13 +15,18 @@ export default new AntamFunction({
       required: true,
       rest: false,
       save: false,
+      raw: true,
     },
   ],
+
   transpile(ctx, [name]) {
-    return this.success(
-      ctx,
-      "void",
-      `${this.code.reserved("context")}.scope.deleteVariable(${name.code})`,
-    );
+    const varName = this.code.unwrapString(name.code);
+    const id = ctx.scope.getVariableID(varName);
+    if (id === undefined) {
+      return this.error(ctx, `Variable "${varName}" is not defined`);
+    }
+    const code = `${this.code.escapeVariableName(id)} = undefined;`;
+    ctx.scope.deleteVariable(varName);
+    return this.success(ctx, "void", code);
   },
 });

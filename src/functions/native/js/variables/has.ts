@@ -16,13 +16,16 @@ export default new AntamFunction({
       required: true,
       rest: false,
       save: false,
+      raw: true,
     },
   ],
   transpile(ctx, [name]) {
-    return this.success(
-      ctx,
-      ArgType.Boolean,
-      `${this.code.reserved("context")}.scope.hasVariable(${name.code})`,
-    );
+    const varName = this.code.unwrapString(name.code);
+    const id = ctx.scope.getVariableID(varName);
+    if (id === undefined) {
+      return this.success(ctx, ArgType.Boolean, `false`);
+    }
+    const code = this.code.escapeVariableName(id);
+    return this.success(ctx, ArgType.Boolean, `typeof ${code} !== 'undefined'`);
   },
 });

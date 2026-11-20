@@ -36,11 +36,10 @@ client.commands.add({
   name: "eval",
   aliases: ["e"],
   code: `
-  $if[$authorID==910837428862984213;$let[a;$eval[$message]]]
+  $if[$authorID==910837428862984213;$var[a;$eval[$message]]]
   $get[a]
   `,
 });
 
 client.commands.load("./tests/bot/commands");
-
 client.login(process.env.DISCORD_TOKEN);
