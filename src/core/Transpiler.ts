@@ -112,7 +112,7 @@ export class Transpiler {
       transpiledCode = [
         `async (${D}) => {`,
         ...bindings,
-        `${Code.reservedNames.context}.startTime = performance.now()`,
+        `const startTime = performance.now();`,
         ctx.scope.scopeFunctions(),
         res.code,
         `${Code.reservedNames.context}.content = ${Code.reservedNames.context}.content.trim();`,

@@ -9,11 +9,7 @@ export default new AntamFunction({
     return this.success(
       ctx,
       ArgType.Number,
-      this.code.binaryExpression(
-        "performance.now()",
-        "-",
-        `${this.code.reserved("context")}.startTime`,
-      ),
+      this.code.binaryExpression("performance.now()", "-", `startTime`),
     );
   },
 });

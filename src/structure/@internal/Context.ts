@@ -11,7 +11,6 @@ export class Context {
 
   #returned: unknown;
   public content: string = "";
-  public readonly startTime = performance.now();
   public discordContainer = new Container(this);
 
   constructor(data: IContext) {

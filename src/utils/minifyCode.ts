@@ -4,11 +4,21 @@ import { Code } from "../structure";
 
 type CaptureGroups = Record<string, string>;
 
-interface MinifierPatch {
+type StringPatch = {
+  match: string;
+  replacement: string;
+};
+
+type RegexPatch = {
   match: RegExp;
   onlyIf?: (match: string, groups: CaptureGroups) => boolean;
   replacement: string | ((match: string, groups: CaptureGroups) => string);
-}
+};
+
+type MinifierPatch = StringPatch | RegexPatch;
+
+const isStringPatch = (patch: MinifierPatch): patch is StringPatch =>
+  typeof patch.match === "string";
 
 export function minifyCode(code: string, fix = 2, toplevel = true): string {
   if (code.includes(Code.contextContent._)) code = minifyCtxContents(code);
@@ -24,7 +34,9 @@ export function minifyCode(code: string, fix = 2, toplevel = true): string {
   });
 
   if (result.error) {
-    throw new Error(`Minification failed: ${result.error}`);
+    throw new Error(`Minification failed: ${result.error}`, {
+      cause: result.error,
+    });
   }
 
   if (fix == 0) return result.code;
@@ -34,8 +46,20 @@ export function minifyCode(code: string, fix = 2, toplevel = true): string {
   return fixed;
 }
 
+// -ve numbers need bras so stuff like a-Number("-5") doesn't become a--5
+function wrapNum(n: number): string {
+  if (Object.is(n, -0)) return "(-0)";
+  return n < 0 ? `(${n})` : `${n}`;
+}
+
 function fixMinifiedCode(code: string, fixAgain = true): string {
   const patches: MinifierPatch[] = [
+    // remove unused performance.now()
+    {
+      match: ";performance.now();",
+      replacement: ";",
+    },
+
     // convert all nested type class casts like Number(Number("123")) to Number("123")
     {
       match:
@@ -56,66 +80,55 @@ function fixMinifiedCode(code: string, fixAgain = true): string {
       },
     },
 
-    // convert all Number("123") or Number(123) to 123
+    // convert all Number("123") or Number(123) or Number("1.5") to 123 / 1.5
     {
       match:
         /(?<![\w$.])Number\((?<quote>["']?)(?<value>[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?|0[xX][\da-fA-F]+|0[bB][01]+|0[oO][0-7]+)\k<quote>\)/g,
       replacement: (_match, groups) => {
-        return `${groups.value}`;
+        return wrapNum(Number(groups.value));
       },
     },
 
-    // convert all Number("123.1") or Number(123.1) to 123.1
-    {
-      match:
-        /(?<![\w$.])Number\((?<quote>["']?)(?<value>[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)\k<quote>\)/g,
-      replacement: (_match, groups) => {
-        return `${groups.value}`;
-      },
-    },
-
-    // Math.floor(integer) or Math.ceil(integer) or Math.round(integer)
+    // Math.floor(1.5) => 1, Math.ceil(1.5) => 2, Math.round(1.5) => 2
     {
       match:
         /(?<![\w$.])Math\.(?<func>floor|ceil|round)\((?<quote>["']?)(?<value>[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)\k<quote>\)/g,
       replacement: (_match, groups) => {
-        return `${groups.value}`;
+        const fn = Math[groups.func as "floor" | "ceil" | "round"];
+        return wrapNum(fn(Number(groups.value)));
       },
     },
 
-    // Math.abs(-d) => d
-    // Math.abs(d) => d
+    // Math.abs(-5) => 5
+    // Math.abs(5) => 5
     {
       match:
         /(?<![\w$.])Math\.abs\((?<quote>["']?)(?<value>[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)\k<quote>\)/g,
       replacement: (_match, groups) => {
-        return `${groups.value}`;
+        return wrapNum(Math.abs(Number(groups.value)));
       },
     },
 
-    // convert all Boolean("true") to true and Boolean("false") to false
-    // also convert Boolean(true) to true and Boolean(false) to false
-    // also Boolean(\d) to true if \d is not 0, and false if \d is 0
-    // also Boolean(!0) to true and Boolean(!1) to false
+    // convert Boolean(true) to !0 and Boolean(false) to !1
+    // also Boolean(\d) to !0 if \d is not 0, and !1 if \d is 0
+    // also Boolean(!0) to !0 and Boolean(!1) to !1
     {
       match:
-        /(?<![\w$.])Boolean\((?<quote>["'])(?<value>true|false)\k<quote>\)|(?<![\w$.])Boolean\((?<value2>[-+]?\d+\.?\d*)\)|(?<![\w$.])Boolean\((?<value3>!0|!1)\)/g,
+        /(?<![\w$.])Boolean\((?<value>true|false)\)|(?<![\w$.])Boolean\((?<value2>[-+]?\d+\.?\d*)\)|(?<![\w$.])Boolean\((?<value3>!0|!1)\)/g,
       replacement: (_match, groups) => {
-        return groups.value
-          ? groups.value
-          : groups.value3
-            ? groups.value3 === "!0"
-              ? "!0"
-              : "!1"
-            : Number(groups.value2) !== 0
-              ? "!0"
-              : "!1";
+        if (groups.value) return groups.value === "true" ? "!0" : "!1";
+        if (groups.value3) return groups.value3;
+        return Number(groups.value2) !== 0 ? "!0" : "!1";
       },
     },
   ];
 
   let fixedCode = code;
   for (const patch of patches) {
+    if (isStringPatch(patch)) {
+      fixedCode = fixedCode.replaceAll(patch.match, patch.replacement);
+      continue;
+    }
     fixedCode = fixedCode.replace(patch.match, (match, ...args) => {
       const position = args.at(-3);
       const groups = args.at(-1);
@@ -136,15 +149,16 @@ function fixMinifiedCode(code: string, fixAgain = true): string {
 
 function minifyCtxContents(code: string) {
   const contentMarker = Code.contextContent._;
-  const regex = new RegExp(`^\\s*${RegExp.escape(contentMarker)}\\s*\\+=[\\s\\S]+""$`);
+  const escapedMarker = RegExp.escape(contentMarker);
+  const regex = new RegExp(`^\\s*${escapedMarker}\\s*\\+=[\\s\\S]+""$`);
+  const prefixRegex = new RegExp(`^\\s*${escapedMarker}\\s*\\+=`);
   const lines = code.split("\n");
   const groupedLines: (string | string[])[] = [];
   let currentBlock: string[] | null = null;
 
-  while (lines.length) {
-    const line = lines.shift();
+  for (const line of lines) {
     if (!line) continue;
-    if (line.match(regex)) {
+    if (regex.test(line)) {
       if (currentBlock) currentBlock.push(line);
       else currentBlock = [line];
       continue;
@@ -152,6 +166,7 @@ function minifyCtxContents(code: string) {
     if (currentBlock) groupedLines.push(currentBlock), (currentBlock = null);
     groupedLines.push(line);
   }
+  if (currentBlock) groupedLines.push(currentBlock);
 
   let newCode = "";
   for (const line of groupedLines) {
@@ -160,9 +175,7 @@ function minifyCtxContents(code: string) {
       continue;
     }
 
-    let parts = line.map((l) =>
-      l.replace(new RegExp(`^\\s*${RegExp.escape(contentMarker)}\\s*\\+=`), "").trim(),
-    );
+    let parts = line.map((l) => l.replace(prefixRegex, "").trim());
     newCode += `${contentMarker} += ${parts.map((p) => Code.parenthesize(p)).join("+")}\n`;
   }
 
