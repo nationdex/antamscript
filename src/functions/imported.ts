@@ -18,13 +18,14 @@ export const GlobalImportedFunctions = {
     let res = await result.run({ ...data, ctx: data.ctx!.clone() });
     return res;
   },
-  random: (a?: number, b?: number, decimals: boolean = false) => {
+  random: (a?: number, b?: number, decimals?: boolean) => {
+    decimals ??= a === undefined && b === undefined;
     if (a === undefined) a = 1;
     if (b === undefined) [a, b] = [0, a];
-    if (a == b) return a;
+    if (a === b) return a;
     if (a > b) [a, b] = [b, a];
-    let value = Math.random() * (b - a + 1) + a;
-    return decimals ? value : ~~value;
+    const value = Math.random() * (b - a + (decimals ? 0 : 1)) + a;
+    return decimals ? value : Math.floor(value);
   },
   pickFromArray: (arr: any[]) => arr[~~(Math.random() * arr.length)],
   isValidJSON: (json: string) => {
