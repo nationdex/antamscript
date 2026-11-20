@@ -19,7 +19,7 @@ export default new AntamFunction({
   ],
 
   transpile(ctx, [variable]) {
-    const code = `(Object.entres(${this.code.getEnvironment(variable.code)}) || [])`;
+    const code = `(Object.entries(${this.code.getEnvironment(variable.code)}) || [])`;
     return this.successJSON(
       ctx,
       {
