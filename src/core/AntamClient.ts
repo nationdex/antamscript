@@ -73,16 +73,16 @@ export class AntamClient extends Client<true> {
     FunctionManager.loadNative();
     EventsManager.loadNative();
 
+    if (this.options.events?.length) {
+      this.events.load(NativeEventName, this.options.events);
+    }
+
     if (this.options.functions) {
       await this.functions.load(this.options.functions);
     }
 
     if (this.options.commands) {
       await this.commands.load(this.options.commands);
-    }
-
-    if (this.options.events?.length) {
-      this.events.load(NativeEventName, this.options.events);
     }
 
     this.options.prefixes = [];

@@ -5,6 +5,7 @@ const client = new AntamClient({
   intents: ["Guilds", "GuildMessages", "MessageContent"],
   prefixes: ["t", "<@$clientID>", "<@!$clientID>"],
   functions: "./tests/bot/customFunctions",
+  mobile: true,
 });
 
 client.functions.add({
