@@ -9,7 +9,8 @@ import fn6 from "./replace";
 import fn7 from "./reverseText";
 import fn8 from "./textLength";
 import fn9 from "./toLowerCase";
-import fn10 from "./toUpperCase";
-import fn11 from "./trim";
+import fn10 from "./toString";
+import fn11 from "./toUpperCase";
+import fn12 from "./trim";
 
-export default [fn0, fn1, fn2, fn3, fn4, fn5, fn6, fn7, fn8, fn9, fn10, fn11];
+export default [fn0, fn1, fn2, fn3, fn4, fn5, fn6, fn7, fn8, fn9, fn10, fn11, fn12];

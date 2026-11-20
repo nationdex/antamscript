@@ -23,7 +23,7 @@ export default new AntamFunction({
     return this.success(
       ctx,
       ArgType.Channel,
-      `(f$findChannelByID(${this.code.reserved("client")}, ${chnl.code} || ${this.code.reserved("discord")}.channel)?.channel ?? null)`,
+      `(f$findChannelByID(${this.code.reserved("client")}, ${chnl.code} || ${this.code.reserved("discord")}.channel) ?? null)`,
     );
   },
 });
