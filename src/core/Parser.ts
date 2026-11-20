@@ -17,6 +17,8 @@ export enum FunctionOperator {
   Silent = "silent",
   /** Counts the items after splitting by the operator arg: $@[sep]fn[...] */
   Count = "count",
+  /** Casts the return type of the function: $&[type]fn[...] */
+  Cast = "cast",
 }
 
 /** Operators that take args. All others take none. */
@@ -24,6 +26,7 @@ const OPERATOR_ARGS: Record<FunctionOperator, boolean> = {
   [FunctionOperator.Negate]: false,
   [FunctionOperator.Silent]: false,
   [FunctionOperator.Count]: true,
+  [FunctionOperator.Cast]: true,
 };
 
 export interface IGlobalFunctionConfig {
@@ -100,8 +103,14 @@ export class Parser {
       "!": FunctionOperator.Negate,
       "#": FunctionOperator.Silent,
       "@": FunctionOperator.Count,
+      "&": FunctionOperator.Cast,
     },
-    operatorOrder: [FunctionOperator.Negate, FunctionOperator.Silent, FunctionOperator.Count],
+    operatorOrder: [
+      FunctionOperator.Negate,
+      FunctionOperator.Silent,
+      FunctionOperator.Count,
+      FunctionOperator.Cast,
+    ],
     ignoreUnknownFunction: false,
     ignoreMissingArgs: false,
   };

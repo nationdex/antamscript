@@ -8,6 +8,7 @@ import { Code } from "./Code";
 import { Context } from "./Context";
 import { Return, ReturnType, ReturnValue } from "./Return";
 import { AntamError, ErrorType } from "../antam/AntamError";
+import { Transpiler } from "../../core/Transpiler";
 
 export type WrappedCode = (args: unknown[]) => string;
 export type WrappedConditionCode = (lhs: unknown, rhs: unknown) => string;
@@ -255,7 +256,18 @@ export class TranspiledFunction<T extends [...IArg[]] = IArg[]> {
         `(arg, sep) => { const count = (v) => Array.isArray(v) ? v.length : v.split(sep).length; return typeof arg == "function" ? () => { let v = arg(); return count(v); } : count(arg); }`,
       );
     }
-    return new Return(ReturnType.Success, out, negatedCode ?? countCode ?? code, ctx);
+
+    let finalCode = negatedCode ?? countCode ?? code;
+
+    // Apply Type Caster operator ($&[type]) if present
+    const castType = this.castType();
+    if (castType !== undefined && !this.isNegated()) {
+      out = castType;
+      const casted = Transpiler.castToType(castType, finalCode as string, ctx);
+      finalCode = casted.code;
+    }
+
+    return new Return(ReturnType.Success, out, finalCode, ctx);
   }
 
   public unsafeSuccess(
@@ -293,5 +305,30 @@ export class TranspiledFunction<T extends [...IArg[]] = IArg[]> {
         ?.args?.[0].map((v) => v.raw)
         .join("") ?? null
     );
+  }
+
+  public isCasted() {
+    return !!this.data.node.operators.find((o) => o.type == FunctionOperator.Cast);
+  }
+
+  public castType(): ArgType | undefined {
+    const rawType = this.data.node.operators
+      .find((o) => o.type == FunctionOperator.Cast)
+      ?.args?.[0]?.map((v) => v.raw)
+      .join("")
+      ?.trim();
+    if (!rawType) return undefined;
+
+    if (/^\d+$/.test(rawType)) {
+      const num = Number(rawType);
+      if (num in ArgType) return num as ArgType;
+    }
+
+    const key = Object.keys(ArgType).find((k) => k.toLowerCase() === rawType.toLowerCase());
+    if (key && typeof (ArgType as any)[key] === "number") {
+      return (ArgType as any)[key] as ArgType;
+    }
+
+    return undefined;
   }
 }

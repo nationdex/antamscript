@@ -501,15 +501,18 @@ export class Transpiler {
     }
   }
 
-  private static castArgument(
-    arg: IArg,
+  public static castToType(
+    type: ArgType,
     code: string,
+    ctx?: Context,
   ): { code: string; functions: [string, Function][] } {
-    switch (arg.type) {
+    let result: { code: string; functions: [string, Function][] };
+    switch (type) {
       case ArgType.String:
-        return { code: `String(${code})`, functions: [] };
+        result = { code: `String(${code})`, functions: [] };
+        break;
       case ArgType.Snowflake:
-        return {
+        result = {
           code: `f$resolveSnowflakeArg(${code})`,
           functions: [
             [
@@ -521,44 +524,65 @@ export class Transpiler {
             ],
           ],
         };
+        break;
       case ArgType.Number:
-        return { code: `Number(${code})`, functions: [] };
+        result = { code: `Number(${code})`, functions: [] };
+        break;
       case ArgType.Boolean:
-        return {
+        result = {
           code: `f$bool(${code})`,
           functions: [
             ["bool", (v: any) => (v == "true" ? true : v == "false" ? false : Boolean(v))],
           ],
         };
+        break;
       case ArgType.Json:
-        return {
+        result = {
           code: `f$json(${code})`,
           functions: [["json", (v: any) => (typeof v === "string" ? JSON.parse(v) : v)]],
         };
-      case ArgType.Enum: {
-        const { enumValues } = Transpiler.getAllowedArgumentTypes(arg.allow ?? arg.type);
-        if (arg.enum) {
-          const enumTypes = Transpiler.getAllowedArgumentTypes(arg.enum);
-          for (const value of enumTypes.enumValues) enumValues.add(value);
-        }
-        const numericValues = [...enumValues].filter(
-          (value): value is number => typeof value === "number",
-        );
-        return numericValues.length
-          ? {
-              code: `f$enum(${code}, [${numericValues.join(",")}])`,
-              functions: [
-                [
-                  "enum",
-                  (v: any, allowed: number[]) =>
-                    typeof v === "string" && allowed.some((i) => String(i) === v) ? Number(v) : v,
-                ],
-              ],
-            }
-          : { code, functions: [] };
-      }
+        break;
       default:
-        return { code, functions: [] };
+        result = { code, functions: [] };
+        break;
     }
+
+    if (ctx && result.functions.length) {
+      for (const [name, fn] of result.functions) {
+        ctx.scope.addFunction(name, `(${fn.toString()})`);
+      }
+    }
+
+    return result;
+  }
+
+  private static castArgument(
+    arg: IArg,
+    code: string,
+  ): { code: string; functions: [string, Function][] } {
+    if (arg.type === ArgType.Enum) {
+      const { enumValues } = Transpiler.getAllowedArgumentTypes(arg.allow ?? arg.type);
+      if (arg.enum) {
+        const enumTypes = Transpiler.getAllowedArgumentTypes(arg.enum);
+        for (const value of enumTypes.enumValues) enumValues.add(value);
+      }
+      const numericValues = [...enumValues].filter(
+        (value): value is number => typeof value === "number",
+      );
+      return numericValues.length
+        ? {
+            code: `f$enum(${code}, [${numericValues.join(",")}])`,
+            functions: [
+              [
+                "enum",
+                (v: any, allowed: number[]) =>
+                  typeof v === "string" && allowed.some((i) => String(i) === v) ? Number(v) : v,
+              ],
+            ],
+          }
+        : { code, functions: [] };
+    }
+
+    return Transpiler.castToType(arg.type, code);
   }
 }
